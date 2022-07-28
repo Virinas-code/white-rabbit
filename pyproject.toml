@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "white-rabbit"
+version = "0.1-indev"
+description = "The White Rabbit chess engine - A neural network engine."
+authors = ["Virinas-code <alexcode228@gmail.com>"]
+license = "GPL-3.0"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+python-chess = "^1.999"
+
+[tool.poetry.dev-dependencies]
+esbonio = "^0.13.1"
+black = "^22.6.0"
+pylint = "^2.14.5"
+mypy = "^0.971"
+flake8 = "^4.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
