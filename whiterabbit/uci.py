@@ -10,7 +10,7 @@ from __future__ import annotations
 import copy
 import sys
 import time
-from typing import Optional
+from typing import Optional, Union
 
 import chess
 
@@ -26,8 +26,8 @@ class UCI:
         """Engine name and version."""
         self.authors: str = "See CREDITS.txt for more info"
         """Engine authors."""
-        self.options: dict[str, str] = {
-            "Hash": "16",
+        self.options: dict[str, Union[int, bool, str]] = {
+            "Hash": 16,
             "NeuralNetwork": "true",
             "OwnBook": "false",
             "SyzygyOnline": "false",

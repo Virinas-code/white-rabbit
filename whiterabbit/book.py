@@ -109,3 +109,34 @@ class Book:
         raise IndexError(
             f"No moves found in Syzygy tables in position {position.fen()}"
         )
+
+    def is_table_position(self, position: Board) -> bool:
+        """
+        Check if a position is present in book or Syzygy tables.
+
+        :param Board position: Python-chess board to check.
+        :return bool: Wether the position is in the book or
+            in the Syzgy tables or not.
+        """
+        return self.is_book_position(position) or self.is_syzygy_position(
+            position
+        )
+
+    def best_table_move(self, position: Board) -> Move:
+        """
+        Get the best move from book or Syzygy tables in a position.
+
+        :param Board position: Python-chess board to get best move.
+        :return Move: The best move in position.
+        :raises IndexError: If the move isn't found in book or Syzgy tables.
+            Use :meth:`is_book_position` to check if the move is in book.
+        """
+        try:
+            return self.best_book_move(position)
+        except IndexError:
+            try:
+                return self.best_syzygy_move(position)
+            except IndexError as exception:
+                raise IndexError(
+                    f"Position not found in tables {position.fen()}"
+                ) from exception
