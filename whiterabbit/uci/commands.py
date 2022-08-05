@@ -122,6 +122,19 @@ class Commands:
                 except ValueError:
                     pass
 
+    def go(self, *args: str) -> None:
+        """
+        UCI `go` command.
+
+        Start calculating.
+
+        :param str args: Command arguments.
+        """
+        if args:
+            pass
+        else:
+            self.engine.search(maxdepth=float("inf"))
+
     def uci_id(self, data: str, value: str) -> None:
         """
         UCI `id` command.

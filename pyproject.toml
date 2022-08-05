@@ -8,6 +8,8 @@ license = "GPL-3.0"
 [tool.poetry.dependencies]
 python = "^3.9"
 python-chess = "^1.999"
+numpy = "^1.23.1"
+psutil = "^5.9.1"
 
 [tool.poetry.dev-dependencies]
 esbonio = "^0.13.1"

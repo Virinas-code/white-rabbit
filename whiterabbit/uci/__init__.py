@@ -7,11 +7,9 @@ UCI main loop.
 """
 from multiprocessing.managers import BaseManager
 import threading
-from time import sleep
 
 from .commands import Commands
 from .engine import Engine
-from .options import Option, SpinOption
 
 
 class UCI:

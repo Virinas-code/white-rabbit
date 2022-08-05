@@ -5,6 +5,8 @@ White Rabbit chess engine.
 
 UCI engine link.
 """
+import sys
+
 import chess
 
 from .options import Option, SpinOption
