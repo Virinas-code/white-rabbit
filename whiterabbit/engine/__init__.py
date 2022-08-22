@@ -5,7 +5,9 @@ White Rabbit chess engine.
 
 Main engine.
 """
+import random
 import sys
+from time import sleep
 
 import chess
 import numpy
@@ -49,3 +51,26 @@ class Engine:
         if nodes_error:
             evaluation.nodes = max_nodes + nodes_error
             evaluation.info()
+
+    def iteration(self, board: chess.Board, move_time: int) -> Evaluation:
+        """
+        Run an iteration.
+
+        :param chess.Board board: Current board.
+        :param int move_time: Maximum move time.
+        :return Evaluation: Position evaluation.
+        """
+        multipv: list[chess.Move] = list(board.legal_moves)
+        random.shuffle(multipv)
+        sleep(3)
+        return Evaluation(
+            1,
+            1,
+            1,
+            multipv,
+            (0, 0),
+            0,
+            sys.maxsize,
+            0,
+            0,
+        )
