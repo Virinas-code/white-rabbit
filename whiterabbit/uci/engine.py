@@ -26,7 +26,8 @@ class Engine:
         Starts shared variables management.
         """
         self.options: dict[str, Option] = {
-            "Hash": SpinOption("Hash", 32, 4096, 1)
+            "Hash": SpinOption("Hash", 32, 4096, 1),
+            "MultiPV": SpinOption("MultiPV", 1, 500, 1),
         }
         """Engine options."""
         self.transpositions: dict[int, Evaluation] = {}
@@ -37,7 +38,7 @@ class Engine:
         """Current search process."""
         self.engine: engine.Engine = engine.Engine()
 
-    def search(self, *args, **kwargs) -> None:
+    def search(self, **kwargs) -> None:
         """
         Starts searching.
 
@@ -45,7 +46,9 @@ class Engine:
         """
         self.stop()
         self.process = Process(
-            target=self.engine.search, args=args, kwargs=kwargs
+            target=self.engine.search,
+            args=[self.position, self.options],
+            kwargs=kwargs,
         )
         self.process.start()
 

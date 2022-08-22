@@ -151,7 +151,15 @@ class Commands:
                     pass
             else:
                 skip_count -= 1
-        self.engine.search(maxdepth=float("inf"))
+        self.engine.search(max_depth=float("inf"))
+
+    def stop(self) -> None:
+        """
+        UCI `stop` command.
+
+        Stop engine thread.
+        """
+        self.engine.stop()  # TODO: bestmove
 
     def quit(self) -> None:
         """
