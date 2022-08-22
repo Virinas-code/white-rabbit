@@ -8,6 +8,15 @@ Launcher, CLI coming soon.
 from .uci import UCI
 
 
-if __name__ == "__main__":
+def main() -> None:
+    """
+    Main function.
+
+    Starts the UCI mainloop.
+    """
     uci: UCI = UCI()
     uci.mainloop()
+
+
+if __name__ == "__main__":
+    main()

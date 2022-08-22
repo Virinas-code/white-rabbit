@@ -13,7 +13,7 @@ from .engine import Engine
 class Commands:
     """White Rabbit's UCI commands."""
 
-    def __init__(self, engine: Engine):
+    def __init__(self):
         """
         Initialize command parser.
 
@@ -21,7 +21,7 @@ class Commands:
         """
         self.debug_mode: bool = False
         """Debug mode status."""
-        self.engine: Engine = engine
+        self.engine: Engine = Engine()
         """Main engine."""
 
     def send(self, *args: str) -> None:
@@ -122,7 +122,7 @@ class Commands:
                 except ValueError:
                     pass
 
-    def go(self, *args: str) -> None:
+    def uci_go(self, *args: str) -> None:
         """
         UCI `go` command.
 
@@ -130,10 +130,36 @@ class Commands:
 
         :param str args: Command arguments.
         """
-        if args:
-            pass
-        else:
-            self.engine.search(maxdepth=float("inf"))
+        search_moves: list[chess.Move] = []
+        skip_count: int = 0  # Skip arguments because they are used
+        for index, arg in enumerate(args):
+            if skip_count == 0:
+                if arg == "searchmoves":
+                    search_move_index: int = 0  # Index to find in string
+                    while True:
+                        search_move_index += 1
+                        try:
+                            search_moves.append(
+                                chess.Move.from_uci(
+                                    args[index + search_move_index]
+                                )
+                            )  # Add next arguments
+                            skip_count += 1  # Skip argument
+                        except ValueError:  # The value is not a valid UCI
+                            break
+                elif arg == "":
+                    pass
+            else:
+                skip_count -= 1
+        self.engine.search(maxdepth=float("inf"))
+
+    def quit(self) -> None:
+        """
+        UCI `quit` command.
+
+        Stop engine thread.
+        """
+        self.engine.stop()
 
     def uci_id(self, data: str, value: str) -> None:
         """

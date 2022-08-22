@@ -261,7 +261,7 @@ Engine to GUI:
 		selective search depth in plies,
 		if the engine sends seldepth there must also be a "depth" present in the same string.
 	* time <x>
-		the time searched in ms, this should be sent together with the pv.
+		 
 	* nodes <x>
 		x nodes searched, the engine should send this info regularly
 	* pv <move1> ... <movei>

@@ -5,7 +5,9 @@ White Rabbit chess engine.
 
 UCI engine link.
 """
+from multiprocessing import Process
 import sys
+from typing import Optional
 
 import chess
 
@@ -30,3 +32,14 @@ class Engine:
         """Transpositions table."""
         self.position: chess.Board = chess.Board()
         """Current position."""
+        self.process: Optional[Process] = None
+        """Current search process."""
+
+    def stop(self) -> None:
+        """
+        Stop search process if running.
+
+        Should be runned when command `quit` received.
+        """
+        if isinstance(self.process, Process):
+            self.process.kill()

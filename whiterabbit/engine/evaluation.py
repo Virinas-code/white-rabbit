@@ -54,3 +54,27 @@ class Evaluation:
         """Tablebase hits."""
         self.cpuload: int = cpuload
         """Permill of CPU used."""
+
+    def info(self) -> None:
+        """
+        Print UCI `info` string.
+
+        ..note::
+            This doesn't use the `UCI` class, because syncing all was too hard.
+        """
+        for multipv, move in enumerate(self.pv):
+            print(
+                "info",
+                "depth",
+                self.depth,
+                "seldepth",
+                self.depth,
+                "time",
+                self.time,
+                "nodes",
+                self.nodes,
+                "pv",
+                move.uci(),
+                "multipv",
+                multipv + 1,
+            )

@@ -42,7 +42,10 @@ class Engine:
             nodes_error = max_nodes % moves
         elif max_depth:
             maximum_depth = max_depth
-        evaluation: Evaluation = Evaluation()
-        for depth in maximum_depth:
-            self.iteration(board, move_time)
+        evaluation: Evaluation = Evaluation(0, 0, 0, [], (0, 0), 0, 0, 0, 0)
+        for depth in range(maximum_depth):
+            evaluation = self.iteration(board, move_time)
+            evaluation.info()
         if nodes_error:
+            evaluation.nodes = max_nodes + nodes_error
+            evaluation.info()

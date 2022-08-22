@@ -7,6 +7,7 @@ UCI main loop.
 """
 from multiprocessing.managers import BaseManager
 import threading
+from typing import Optional
 
 from .commands import Commands
 from .engine import Engine
@@ -24,12 +25,7 @@ class UCI:
         BaseManager.register("Engine", Engine)
         self.manager: BaseManager = BaseManager()
         """Shared variables manager."""
-        self.manager.start()
-        self.engine: Engine = BaseManager.Engine()  # type: ignore
-        """Shared engine."""
-        self.commands_parser: Commands = BaseManager.Commands(  # type: ignore
-            self.engine
-        )
+        self.commands_parser: Commands = Commands()  # type: ignore
         """Commands parser."""
 
     def mainloop(self) -> None:
@@ -44,6 +40,8 @@ class UCI:
                 target=self.parse, args=[command_string]
             )
             thread.start()
+            if command_string == "quit":
+                break
 
     def parse(self, command: str) -> None:
         """
@@ -74,6 +72,8 @@ class UCI:
             self.commands_parser.stop()
         elif keyword == "ponderhit":
             self.commands_parser.ponderhit()
+        elif keyword == "quit":
+            self.commands_parser.quit()
         elif keyword == "":
             pass
         else:
