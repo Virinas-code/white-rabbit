@@ -6,10 +6,11 @@ White Rabbit chess engine.
 UCI engine link.
 """
 from multiprocessing import Process
-import sys
 from typing import Optional
 
 import chess
+
+from whiterabbit import engine
 
 from .options import Option, SpinOption
 from ..engine.evaluation import Evaluation
@@ -34,6 +35,19 @@ class Engine:
         """Current position."""
         self.process: Optional[Process] = None
         """Current search process."""
+        self.engine: engine.Engine = engine.Engine()
+
+    def search(self, *args, **kwargs) -> None:
+        """
+        Starts searching.
+
+        Starts a process for engine search.
+        """
+        self.stop()
+        self.process = Process(
+            target=self.engine.search, args=args, kwargs=kwargs
+        )
+        self.process.start()
 
     def stop(self) -> None:
         """
