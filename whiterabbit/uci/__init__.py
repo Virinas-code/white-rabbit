@@ -8,6 +8,7 @@ UCI main loop.
 from multiprocessing.managers import BaseManager
 import threading
 from typing import Optional
+import pkg_resources
 
 from .commands import Commands
 from .engine import Engine
@@ -27,6 +28,17 @@ class UCI:
         """Shared variables manager."""
         self.commands_parser: Commands = Commands()  # type: ignore
         """Commands parser."""
+        self.about()
+
+    def about(self) -> None:
+        """
+        Prints engine infos.
+
+        Prints name and author.
+        """
+        version: str = pkg_resources.get_distribution("white-rabbit").version
+        self.commands_parser.uci_id("name", "White Rabbit " + version)
+        self.commands_parser.uci_id("author", "Virinas-code and others")
 
     def mainloop(self) -> None:
         """

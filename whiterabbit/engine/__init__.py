@@ -12,6 +12,8 @@ from time import sleep
 import chess
 import numpy
 
+from ..uci.options import Option, SpinOption
+
 from .evaluation import Evaluation
 
 
@@ -21,6 +23,7 @@ class Engine:
     def search(
         self,
         board: chess.Board,
+        options: dict[str, Option],
         *,
         max_depth: int = 0,
         max_nodes: int = sys.maxsize,
@@ -38,6 +41,11 @@ class Engine:
         hidden_layers: list[numpy.ndarray] = []
         maximum_depth: int = sys.maxsize
         nodes_error: int = 0
+        multi_pv: int = (
+            options["MultiPV"].value
+            if isinstance(options["MultiPV"], SpinOption)
+            else 1
+        )
         if max_nodes:
             moves: int = len(list(board.legal_moves))
             maximum_depth = int(max_nodes / moves)
@@ -46,11 +54,12 @@ class Engine:
             maximum_depth = max_depth
         evaluation: Evaluation = Evaluation(0, 0, 0, [], (0, 0), 0, 0, 0, 0)
         for depth in range(maximum_depth):
+            print("info string", depth)
             evaluation = self.iteration(board, move_time)
-            evaluation.info()
+            evaluation.info(multi_pv)
         if nodes_error:
             evaluation.nodes = max_nodes + nodes_error
-            evaluation.info()
+            evaluation.info(multi_pv)
 
     def iteration(self, board: chess.Board, move_time: int) -> Evaluation:
         """

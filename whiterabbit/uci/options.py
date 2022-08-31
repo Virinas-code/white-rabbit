@@ -28,6 +28,8 @@ class Option:
         """
         self.name: str = name
         """Option name."""
+        self.value: None = None
+        """Option value."""
 
     def set(self, value: str) -> bool:
         """

@@ -76,8 +76,8 @@ class Commands:
         """
         if len(args) > 1 and args[0] == "name":
             option_name: str = args[1]
-            if len(args) > 3 and args[3] == "value":
-                option_value: str = " ".join(args[4:])
+            if len(args) > 3 and args[2] == "value":
+                option_value: str = " ".join(args[3:])
                 if option_name in self.engine.options:
                     self.engine.options[option_name].set(option_value)
             else:
@@ -132,6 +132,8 @@ class Commands:
         """
         search_moves: list[chess.Move] = []
         skip_count: int = 0  # Skip arguments because they are used
+        move_time: int = 0
+        mode: str = "infinite"
         for index, arg in enumerate(args):
             if skip_count == 0:
                 if arg == "searchmoves":
@@ -147,11 +149,18 @@ class Commands:
                             skip_count += 1  # Skip argument
                         except ValueError:  # The value is not a valid UCI
                             break
-                elif arg == "":
-                    pass
+                elif arg == "movetime":
+                    move_time = int(args[index + 1])
+                    mode = "movetime"
+                    skip_count = 1
             else:
                 skip_count -= 1
-        self.engine.search(max_depth=float("inf"))
+        for move in search_moves:
+            self.engine.position.push(move)
+        if mode == "infinite":
+            self.engine.search(max_depth=float("inf"))
+        elif mode == "movetime":
+            self.engine.search(move_time=move_time)
 
     def stop(self) -> None:
         """

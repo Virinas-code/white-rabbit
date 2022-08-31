@@ -55,26 +55,29 @@ class Evaluation:
         self.cpuload: int = cpuload
         """Permill of CPU used."""
 
-    def info(self) -> None:
+    def info(self, multi_pv: int) -> None:
         """
         Print UCI `info` string.
 
         ..note::
             This doesn't use the `UCI` class, because syncing all was too hard.
+
+        :param int multi_pv: MultiPV value.
         """
         for multipv, move in enumerate(self.pv):
-            print(
-                "info",
-                "depth",
-                self.depth,
-                "seldepth",
-                self.depth,
-                "time",
-                self.time,
-                "nodes",
-                self.nodes,
-                "pv",
-                move.uci(),
-                "multipv",
-                multipv + 1,
-            )
+            if multipv < multi_pv:
+                print(
+                    "info",
+                    "depth",
+                    self.depth,
+                    "seldepth",
+                    self.depth,
+                    "time",
+                    self.time,
+                    "nodes",
+                    self.nodes,
+                    "pv",
+                    move.uci(),
+                    "multipv",
+                    multipv + 1,
+                )
