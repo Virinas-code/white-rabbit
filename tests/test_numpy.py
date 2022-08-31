@@ -33,13 +33,17 @@ def matmul_speed(dtype: str, iterations: int):
             dtype=dtype,
         )
     else:
-        min_value = np.iinfo(np.dtype(dtype)).min
-        max_value = np.iinfo(np.dtype(dtype)).max
+        try:
+            min_value = np.iinfo(np.dtype(dtype)).min
+            max_value = np.iinfo(np.dtype(dtype)).max
+        except ValueError:
+            min_value = np.finfo(np.dtype(dtype)).min
+            max_value = np.finfo(np.dtype(dtype)).max
         print(max_value - min_value)
-        matrix1 = np.random.randint(
+        matrix1 = np.random.uniform(
             min_value, max_value, size=(12, 12, 8, 8)
         ).astype(dtype)
-        matrix2 = np.random.randint(
+        matrix2 = np.random.uniform(
             min_value, max_value, size=(12, 12, 8, 8)
         ).astype(dtype)
     for loop in range(iterations):
