@@ -68,7 +68,6 @@ class NeuralNetwork:
             "R-D": correction[1],
         }
 
-<<<<<<< HEAD
     @classmethod
     def random(cls):
         """
@@ -117,61 +116,6 @@ class NeuralNetwork:
             tuple(correction.values()),
         )
 
-||||||| b7dca68
-=======
-    @classmethod
-    def random(cls):
-        """
-        Generate a random network.
-
-        Fully random network.
-        """
-        matrices_left: list[np.ndarray] = []
-        matrices_right: list[np.ndarray] = []
-        biases: list[np.ndarray] = []
-        for layer in range(HIDDEN_LAYERS + 2):
-            matrices_left.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-            matrices_right.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-            biases.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-        scalar_matrices: dict[str, np.ndarray] = {
-            "R-Gi": np.random.randint(0, 255, (8, 8, 1, 12)).astype(np.uint8),
-            "R-Di": np.random.randint(0, 255, (8, 8, 12, 1)).astype(np.uint8),
-            "R-Ge": np.random.randint(0, 255, (1, 8, 1, 1)).astype(np.uint8),
-            "R-De": np.random.randint(0, 255, (8, 1, 1, 1)).astype(np.uint8),
-        }
-        reduce_matrices: dict[str, np.ndarray] = {
-            "RM-G": np.random.randint(0, 255, (16, 16, 1, 12)).astype(
-                np.uint8
-            ),
-            "RM-D": np.random.randint(0, 255, (16, 16, 12, 1)).astype(
-                np.uint8
-            ),
-        }
-        expand_matrices: dict[str, np.ndarray] = {
-            "EX-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
-            "EX-D": np.random.randint(0, 255, (96, 14)).astype(np.uint8),
-        }
-        correction: dict[str, np.ndarray] = {
-            "R-G": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
-            "R-D": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
-        }
-        return cls(
-            matrices_left,
-            matrices_right,
-            list(scalar_matrices.values()),
-            list(reduce_matrices.values()),
-            list(expand_matrices.values()),
-            biases,
-            tuple(correction.values()),
-        )
-
->>>>>>> d8dd0d896a10962c147427cdef6ac1a8dde1b81d
     def search(self, board: chess.Board, depth: int) -> list[chess.Move]:
         """
         Search best moves in a position.
