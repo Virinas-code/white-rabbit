@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "white-rabbit"
-version = "0.1.3"
+version = "0.1.4"
 description = "The White Rabbit chess engine - A neural network engine."
 authors = ["Virinas-code <alexcode228@gmail.com>"]
 license = "GPL-3.0"

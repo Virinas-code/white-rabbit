@@ -2,9 +2,11 @@
 # -*- coding: utf-8 -*-
 """
 White Rabbit chess engine.
-
+ 
 UCI commands parser.
 """
+import sys
+
 import chess
 from .options import ButtonOption, Option
 from .engine import Engine
@@ -160,6 +162,7 @@ class Commands:
         if mode == "infinite":
             self.engine.search(max_depth=float("inf"))
         elif mode == "movetime":
+            print("## MOVETIME", file=sys.stderr)
             self.engine.search(move_time=move_time)
 
     def stop(self) -> None:
