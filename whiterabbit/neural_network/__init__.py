@@ -95,12 +95,8 @@ class NeuralNetwork:
             "R-De": np.random.randint(0, 255, (8, 1, 1, 1)).astype(np.uint8),
         }
         reduce_matrices: dict[str, np.ndarray] = {
-            "RM-G": np.random.randint(0, 255, (16, 16, 1, 12)).astype(
-                np.uint8
-            ),
-            "RM-D": np.random.randint(0, 255, (16, 16, 12, 1)).astype(
-                np.uint8
-            ),
+            "RM-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
+            "RM-D": np.random.randint(0, 255, (96, 14)).astype(np.uint8),
         }
         expand_matrices: dict[str, np.ndarray] = {
             "EX-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
