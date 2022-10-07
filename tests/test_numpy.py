@@ -79,7 +79,7 @@ def test_int8_matmul(benchmark):
 
 def test_uint16_matmul(benchmark):
     """
-    Test speed of matmul on bool matrices.
+    Test speed of matmul on integers matrices.
 
     dtype: uint16
     """
@@ -88,7 +88,7 @@ def test_uint16_matmul(benchmark):
 
 def test_int16_matmul(benchmark):
     """
-    Test speed of matmul on bool matrices.
+    Test speed of matmul on integers matrices.
 
     dtype: int16
     """
@@ -97,8 +97,35 @@ def test_int16_matmul(benchmark):
 
 def test_float16_matmul(benchmark):
     """
-    Test speed of matmul on bool matrices.
+    Test speed of matmul on floating points matrices.
 
     dtype: float16
     """
     benchmark(matmul_speed, "float16", 10000)
+
+
+def test_uint32_matmul(benchmark):
+    """
+    Test speed of matmul on integers matrices.
+
+    dtype: uint32
+    """
+    benchmark(matmul_speed, "uint32", 10000)
+
+
+def test_int32_matmul(benchmark):
+    """
+    Test speed of matmul on integers matrices.
+
+    dtype: int32
+    """
+    benchmark(matmul_speed, "int32", 10000)
+
+
+def test_float32_matmul(benchmark):
+    """
+    Test speed of matmul on floating points matrices.
+
+    dtype: float32
+    """
+    benchmark(matmul_speed, "float32", 10000)
