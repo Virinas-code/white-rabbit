@@ -9,6 +9,8 @@ from types import LambdaType
 from typing import Callable
 import chess
 import numpy as np
+
+from .utils.equivalence import networks_equal
 from .utils.save import load_method, save_method
 
 HIDDEN_LAYERS: int = 16  # Amount of hidden layers
@@ -71,6 +73,11 @@ class NeuralNetwork:
 
     save: Callable = save_method
     load: classmethod = classmethod(load_method)
+
+    def __eq__(self, __o: object) -> bool:
+        if not isinstance(__o, NeuralNetwork):
+            raise NotImplementedError("can only compare two neural networks")
+        return networks_equal(__o, self)
 
     @classmethod
     def random(cls):
