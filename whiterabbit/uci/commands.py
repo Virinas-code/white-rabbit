@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 White Rabbit chess engine.
+ Flib1301
  
 UCI commands parser.
 """

@@ -5,10 +5,11 @@ White Rabbit chess engine.
 
 Neural network object.
 """
-from types import LambdaType
-from typing import Callable
+from typing import Callable, Type, TypeVar
+
 import chess
 import numpy as np
+import numpy.lib.npyio
 
 from .utils.equivalence import networks_equal
 from .utils.save import load_method, save_method
@@ -24,6 +25,9 @@ PIECES_VALUES: dict[chess.PieceType, int] = {
     chess.KING: 5,
 }
 
+NeuralNetworkType: Type = TypeVar("NeuralNetworkType", bound="NeuralNetwork")
+"""Neural network type annotation."""
+
 
 class NeuralNetwork:
     """Base neural network object."""
@@ -34,7 +38,6 @@ class NeuralNetwork:
         matrices_right: list[np.ndarray],
         scalar_matrices: list[np.ndarray],
         reduce_matrices: list[np.ndarray],
-        expand_matrices: list[np.ndarray],
         biases: list[np.ndarray],
         correction: tuple[np.ndarray, np.ndarray],
     ) -> None:
@@ -43,7 +46,6 @@ class NeuralNetwork:
 
         :param list[np.ndarray] matrices: Weights
         :param list[np.ndarray] scalar_matrices: Reduce to scalar matrices.
-        :param list[np.ndarray] expand_matrices: Expansion matrices.
         :param list[np.ndarray] reduce_matrices: Reduction matrices.
         :param list[np.ndarray] biases: Biases matrices.
         :param tuple[np.ndarray, np.ndarray] correction: Correction matrice for scalar reduction.
@@ -60,10 +62,6 @@ class NeuralNetwork:
         self.reduce_matrices: dict[str, np.ndarray] = {
             "RM-G": reduce_matrices[0],
             "RM-D": reduce_matrices[1],
-        }
-        self.expand_matrices: dict[str, np.ndarray] = {
-            "EX-G": expand_matrices[0],
-            "EX-D": expand_matrices[1],
         }
         self.biases: list[np.ndarray] = biases
         self.correction: dict[str, np.ndarray] = {
@@ -109,10 +107,6 @@ class NeuralNetwork:
             "RM-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
             "RM-D": np.random.randint(0, 255, (96, 14)).astype(np.uint8),
         }
-        expand_matrices: dict[str, np.ndarray] = {
-            "EX-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
-            "EX-D": np.random.randint(0, 255, (96, 14)).astype(np.uint8),
-        }
         correction: dict[str, np.ndarray] = {
             "R-G": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
             "R-D": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
@@ -122,7 +116,6 @@ class NeuralNetwork:
             matrices_right,
             list(scalar_matrices.values()),
             list(reduce_matrices.values()),
-            list(expand_matrices.values()),
             biases,
             tuple(correction.values()),
         )
@@ -267,18 +260,9 @@ class NeuralNetwork:
             e_layer = hidden_layer
         e_layer = e_layer.reshape(96, 96)
         print(e_layer.shape)
-        print(
-            self.expand_matrices["EX-G"].shape,
-            self.expand_matrices["EX-D"].shape,
-        )
-        extended_matrix: np.ndarray = (
-            self.expand_matrices["EX-G"]
-            @ e_layer
-            @ self.expand_matrices["EX-D"]
-        )
         output_layer: np.ndarray = (
             self.reduce_matrices["RM-G"]
-            @ extended_matrix
+            @ e_layer
             @ self.reduce_matrices["RM-D"]
         )
         return output_layer
@@ -297,16 +281,20 @@ class NeuralNetwork:
         piece_map: dict[chess.Square, chess.Piece] = board.piece_map()
 
         def parse_move(line: np.ndarray) -> chess.Move:
-            bool_to_int: Callable[[np.ndarray], int] = (
+            bool3_to_int: Callable[[np.ndarray], int] = (
                 lambda a: (1 if a[0] else 0)
                 + (2 if a[1] else 0)
                 + (4 if a[2] else 0)
             )
-            from_rank: int = bool_to_int(line[0:3])
-            to_rank: int = bool_to_int(line[3:6])
-            from_file: int = bool_to_int(line[6:9])
-            to_file: int = bool_to_int(line[9:12])
-            promotion: int = chess.PieceType(bool_to_int(line[12:15]) + 1)
+            bool2_to_int: Callable[[np.ndarray], int] = lambda a: (
+                1 if a[0] else 0
+            ) + (2 if a[1] else 0)
+            print(bool2_to_int(line[12:14]) + 1)
+            from_rank: int = bool3_to_int(line[0:3])
+            to_rank: int = bool3_to_int(line[3:6])
+            from_file: int = bool3_to_int(line[6:9])
+            to_file: int = bool3_to_int(line[9:12])
+            promotion: int = chess.PieceType(bool2_to_int(line[12:14]) + 1)
             return chess.Move(
                 chess.square(from_file, from_rank),
                 chess.square(to_file, to_rank),
@@ -314,7 +302,7 @@ class NeuralNetwork:
             )
 
         def is_legal(move: chess.Move) -> bool:
-            for legal_move in legal_moves:
+            """for legal_move in legal_moves:
                 if (
                     legal_move.from_square == move.from_square
                     and legal_move.to_square == move.to_square
@@ -333,7 +321,8 @@ class NeuralNetwork:
                     else:
                         move.promotion = None
                         return True
-            return False
+            return False"""
+            return True
 
         output: np.ndarray = output_layer > 127
         good_moves: list[chess.Move] = []
