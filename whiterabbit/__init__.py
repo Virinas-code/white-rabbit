@@ -18,7 +18,7 @@ def train_start(config: bool = False) -> None:
     """
     trainer: Trainer = Trainer()
     if config:
-        trainer.prompt_config()
+        trainer.prompt_conf()
 
 
 def train_cleanup() -> None:
