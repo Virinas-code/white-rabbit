@@ -5,17 +5,7 @@ White Rabbit chess engine.
 
 Launcher, CLI coming soon.
 """
-from .uci import UCI
-
-
-def main() -> None:
-    """
-    Main function.
-
-    Starts the UCI mainloop.
-    """
-    uci: UCI = UCI()
-    uci.mainloop()
+from .cli import main
 
 
 if __name__ == "__main__":
