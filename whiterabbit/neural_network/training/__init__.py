@@ -14,6 +14,7 @@ from typing import Any
 from .rich_cli import RichCLI
 
 DEFAULT_CONFIG: dict[str, Any] = {"iterations": 10}
+WHITE_RABBIT_ETC: str = os.path.expanduser("~/.local/etc/white-rabbit")
 
 
 class Trainer:
@@ -39,13 +40,13 @@ class Trainer:
         """
         try:
             with open(
-                "~/.local/etc/white-rabbit/train-config.json", encoding="utf-8"
+                WHITE_RABBIT_ETC + "/train-config.json", encoding="utf-8"
             ) as file:
                 return json.load(file)
         except FileNotFoundError:
-            os.mkdir("~/.local/etc/white-rabbit")
+            os.mkdir(WHITE_RABBIT_ETC)
             with open(
-                "~/.local/etc/white-rabbit/train-config.json",
+                WHITE_RABBIT_ETC + "/train-config.json",
                 "w",
                 encoding="utf-8",
             ) as file:
@@ -58,4 +59,4 @@ class Trainer:
 
         Prompts settings.
         """
-        iterations: int = self.rich.prompt("Iterations", int)
+        self.config["iterations"] = self.rich.prompt("Iterations", int)
