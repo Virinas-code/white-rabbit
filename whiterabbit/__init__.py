@@ -10,10 +10,15 @@ import os
 from .neural_network.training import Trainer
 
 
-def train() -> None:
-    """Train target."""
+def train_start(config: bool = False) -> None:
+    """
+    Train target.
+
+    :param bool config: Wether to reset config or not.
+    """
     trainer: Trainer = Trainer()
-    print(trainer)
+    if config:
+        trainer.prompt_config()
 
 
 def train_cleanup() -> None:

@@ -7,7 +7,7 @@ Command Line Interface.
 """
 import click
 
-from . import train_cleanup
+from . import train_start, train_cleanup
 from .uci import UCI
 
 
@@ -31,12 +31,18 @@ def train():
 
 
 @train.command()
-def start():
+@click.option(
+    "-c", "--config", "config", default=False, is_flag=True, type=bool
+)
+def start(config: bool = False):
     """
     Start training.
 
     Launch a training session.
+
+    :param bool config: Wether to reconfigure arguments or not.
     """
+    train_start(config)
 
 
 @train.command()

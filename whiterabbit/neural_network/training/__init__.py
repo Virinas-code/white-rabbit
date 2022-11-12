@@ -28,9 +28,6 @@ class Trainer:
         self.rich: RichCLI = RichCLI()
         """Base logger using :py:mod:`rich`."""
         self.config: dict[str, Any] = self.load_config()
-        if "--config" in sys.argv:
-            self.prompt_config()
-        self.train()
 
     def load_config(self) -> dict[str, Any]:
         """
