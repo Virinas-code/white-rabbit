@@ -9,6 +9,7 @@ from types import LambdaType
 from typing import Callable
 import chess
 import numpy as np
+from .utils.save import load_method, save_method
 
 HIDDEN_LAYERS: int = 16  # Amount of hidden layers
 RTS_DIFF: int = 12
@@ -67,6 +68,9 @@ class NeuralNetwork:
             "R-G": correction[0],
             "R-D": correction[1],
         }
+
+    save: Callable = save_method
+    load: classmethod = classmethod(load_method)
 
     @classmethod
     def random(cls):
