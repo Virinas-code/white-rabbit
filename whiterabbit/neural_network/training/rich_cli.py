@@ -5,6 +5,7 @@ White Rabbit chess engine.
 
 CLI Logger to display rich text.
 """
+import time
 from typing import Any
 
 from rich.console import Console
@@ -41,6 +42,9 @@ class RichCLI:
                 break
             except (ValueError, TypeError):
                 self.console.print(
-                    "[bold red]Please enter a valid value.[/bold red]"
+                    "[bold red]Please enter a valid value.[/bold red]",
+                    end="\r",
                 )
+                time.sleep(2)
+                self.console.print(" " * 30, end="\r")
         return answer
