@@ -29,8 +29,8 @@ ipykernel = "^6.15.1"
 pyinstrument = "^4.3.0"
 py-spy = "^0.3.12"
 jupyter = "^1.0.0"
-notebook = "^6.4.12"
-pytest-benchmark = "^4.0.0"
+notebook = "^6.5.2"
+pytest-benchmark = "^3.4.1"
 austin-tui = "^1.2.0"
 
 [tool.poetry.scripts]
