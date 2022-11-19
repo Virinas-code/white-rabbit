@@ -5,10 +5,10 @@ White Rabbit chess engine.
 
 UCI main loop.
 """
+import importlib.metadata
 from multiprocessing.managers import BaseManager
 import threading
 from typing import Optional
-import pkg_resources
 
 from .commands import Commands
 from .engine import Engine
@@ -36,7 +36,7 @@ class UCI:
 
         Prints name and author.
         """
-        version: str = pkg_resources.get_distribution("white-rabbit").version
+        version: str = importlib.metadata.version("white-rabbit")
         self.commands_parser.uci_id("name", "White Rabbit " + version)
         self.commands_parser.uci_id("author", "Virinas-code and others")
 

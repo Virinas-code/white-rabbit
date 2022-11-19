@@ -5,81 +5,79 @@ White Rabbit chess engine.
 
 Main engine.
 """
+import math
 import random
 import sys
 from time import sleep
 
 import chess
+import chess.engine
 import numpy
 
 from ..uci.options import Option, SpinOption
+from ..neural_network import HIDDEN_LAYERS, NeuralNetwork
 
 from .evaluation import Evaluation
 
 
-class Engine:
-    """The main engine."""
+def search(
+    self,
+    board: chess.Board,
+    options: dict[str, Option],
+    limit: chess.engine.Limit,
+) -> chess.engine.PlayResult:
+    # Time left and increment
+    my_clock_time: float = float("inf")
+    if board.turn and limit.white_clock:
+        my_clock_time = limit.white_clock
+    elif not board.turn and limit.black_clock:
+        my_clock_time = limit.black_clock
+    my_increment: float = 0
+    if board.turn and limit.white_inc:
+        my_increment = limit.white_inc
+    elif not board.turn and limit.black_inc:
+        my_increment = limit.black_inc
 
-    def search(
-        self,
-        board: chess.Board,
-        options: dict[str, Option],
-        *,
-        max_depth: int = 0,
-        max_nodes: int = sys.maxsize,
-        move_time: int = sys.maxsize
-    ) -> tuple[chess.Move, chess.Move]:
-        """
-        Search in position.
+    # Move play time
+    move_play_time: float = sfloat("inf")
+    if limit.time:
+        move_play_time = limit.time
+    else:
+        move_play_time = my_increment + my_clock_time * (1 / 5)
 
-        :param chess.Board board: Board to search best move.
-        :param int max_depth: Maximum allowed depth.
-        :param int max_nodes: Maximum number of nodes.
-        :param int move_time: Time to move.
-        :return tuple[chess.Move, chess.Move]
-        """
-        hidden_layers: list[numpy.ndarray] = []
-        maximum_depth: int = sys.maxsize
-        nodes_error: int = 0
-        multi_pv: int = (
-            options["MultiPV"].value
-            if isinstance(options["MultiPV"], SpinOption)
-            else 1
-        )
-        if max_nodes:
-            moves: int = len(list(board.legal_moves))
-            maximum_depth = int(max_nodes / moves)
-            nodes_error = max_nodes % moves
-        elif max_depth:
-            maximum_depth = max_depth
-        evaluation: Evaluation = Evaluation(0, 0, 0, [], (0, 0), 0, 0, 0, 0)
-        for depth in range(maximum_depth):
-            print("info string", depth)
-            evaluation = self.iteration(board, move_time)
-            evaluation.info(multi_pv)
-        if nodes_error:
-            evaluation.nodes = max_nodes + nodes_error
-            evaluation.info(multi_pv)
+    # Search depth
+    target_depth: int = sys.maxsize
+    if limit.depth:
+        target_depth = limit.depth
+    elif limit.nodes:
+        target_depth = math.floor(limit.nodes / HIDDEN_LAYERS)
 
-    def iteration(self, board: chess.Board, move_time: int) -> Evaluation:
-        """
-        Run an iteration.
+    good_moves: list[chess.Move] = self.neural_network.search(
+        board, target_depth
+    )
 
-        :param chess.Board board: Current board.
-        :param int move_time: Maximum move time.
-        :return Evaluation: Position evaluation.
-        """
-        multipv: list[chess.Move] = list(board.legal_moves)
-        random.shuffle(multipv)
-        sleep(3)
-        return Evaluation(
-            1,
-            1,
-            1,
-            multipv,
-            (0, 0),
-            0,
-            sys.maxsize,
-            0,
-            0,
-        )
+    return chess.engine.PlayResult(good_moves[0], None)
+
+
+def iteration(self, board: chess.Board, move_time: int) -> Evaluation:
+    """
+    Run an iteration.
+
+    :param chess.Board board: Current board.
+    :param int move_time: Maximum move time.
+    :return Evaluation: Position evaluation.
+    """
+    multipv: list[chess.Move] = list(board.legal_moves)
+    random.shuffle(multipv)
+    sleep(3)
+    return Evaluation(
+        1,
+        1,
+        1,
+        multipv,
+        (0, 0),
+        0,
+        sys.maxsize,
+        0,
+        0,
+    )
