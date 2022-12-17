@@ -12,9 +12,10 @@ import numpy as np
 import numpy.lib.npyio
 
 from .utils.equivalence import networks_equal
+from .utils.random import random_method
 from .utils.save import load_method, save_method
 
-HIDDEN_LAYERS: int = 16  # Amount of hidden layers
+HIDDEN_LAYERS: int = 8  # Amount of hidden layers
 RTS_DIFF: int = 12
 PIECES_VALUES: dict[chess.PieceType, int] = {
     chess.PAWN: 0,
@@ -71,54 +72,12 @@ class NeuralNetwork:
 
     save: Callable = save_method
     load: classmethod = classmethod(load_method)
+    random: classmethod = classmethod(random_method)
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NeuralNetwork):
             raise NotImplementedError("can only compare two neural networks")
         return networks_equal(__o, self)
-
-    @classmethod
-    def random(cls):
-        """
-        Generate a random network.
-
-        Fully random network.
-        """
-        matrices_left: list[np.ndarray] = []
-        matrices_right: list[np.ndarray] = []
-        biases: list[np.ndarray] = []
-        for layer in range(HIDDEN_LAYERS + 2):
-            matrices_left.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-            matrices_right.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-            biases.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-        scalar_matrices: dict[str, np.ndarray] = {
-            "R-Gi": np.random.randint(0, 255, (8, 8, 1, 12)).astype(np.uint8),
-            "R-Di": np.random.randint(0, 255, (8, 8, 12, 1)).astype(np.uint8),
-            "R-Ge": np.random.randint(0, 255, (1, 8, 1, 1)).astype(np.uint8),
-            "R-De": np.random.randint(0, 255, (8, 1, 1, 1)).astype(np.uint8),
-        }
-        reduce_matrices: dict[str, np.ndarray] = {
-            "RM-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
-            "RM-D": np.random.randint(0, 255, (96, 14)).astype(np.uint8),
-        }
-        correction: dict[str, np.ndarray] = {
-            "R-G": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
-            "R-D": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
-        }
-        return cls(
-            matrices_left,
-            matrices_right,
-            list(scalar_matrices.values()),
-            list(reduce_matrices.values()),
-            biases,
-            tuple(correction.values()),
-        )
 
     def search(self, board: chess.Board, depth: int) -> list[chess.Move]:
         """
