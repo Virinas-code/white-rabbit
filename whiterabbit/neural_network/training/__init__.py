@@ -7,11 +7,16 @@ Base training object.
 """
 from typing import Union
 
+import chess
 import numpy as np
 
 from .. import NeuralNetwork
 
 HIDDEN_LAYERS: int = 8  # Amount of hidden layers
+
+DirectionMatrices: type = tuple[
+    dict[str, list[np.ndarray]], dict[str, dict[str, np.ndarray]]
+]
 
 
 class Trainer:
@@ -44,14 +49,17 @@ class Trainer:
 
     def generate_dir_matrices(
         self,
-    ) -> list[Union[list[np.ndarray], dict[str, np.ndarray]]]:
+    ) -> DirectionMatrices:
         """
         Generate direction matrices.
+
+        :return tuple[dict[str, list[np.ndarray]],
+            dict[str, dict[str, np.ndarray]]]: Direction matrices.
         """
         matrices_left: list[np.ndarray] = []
         matrices_right: list[np.ndarray] = []
         biases: list[np.ndarray] = []
-        for layer in range(HIDDEN_LAYERS + 2):
+        for _ in range(HIDDEN_LAYERS + 2):
             matrices_left.append(
                 np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
             )
@@ -75,7 +83,76 @@ class Trainer:
             "R-G": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
             "R-D": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
         }
-        return cls(
+        return (
+            {
+                "matrices_left": matrices_left,
+                "matrices_right": matrices_right,
+                "biases": biases,
+            },
+            {
+                "scalar_matrices": scalar_matrices,
+                "reduce_matrices": reduce_matrices,
+                "correction": correction,
+            },
+        )
+
+    def mutations_loop(self, direction_matrices: DirectionMatrices) -> None:
+        """
+        Iteration main loop.
+
+        Generates all mutated networks.
+
+        :param DirectionMatrices direction_matrices: Direction matrices.
+        """
+        mutated_networks: list[NeuralNetwork] = []  # Rj
+        for network in range(0, 256):
+            mutated_networks.append(
+                self.generate_network(network, direction_matrices)
+            )
+        self.games_loop(mutated_networks)
+
+    def generate_network(
+        self, mutation: int, direction_matrices: DirectionMatrices
+    ) -> NeuralNetwork:
+        """
+        Generate a mutated network.
+
+        :param int mutation: Network ID.
+        :param DirectionMatrices direction_matrices: Direction matrices.
+        :return NeuralNetwork: Mutated neural network.
+        """
+        matrices_left: list[np.ndarray] = []
+        matrices_right: list[np.ndarray] = []
+        biases: list[np.ndarray] = []
+        for layer in range(HIDDEN_LAYERS):
+            matrices_left.append(
+                self.first_network.matrices_left[layer]
+                + mutation * direction_matrices[0]["matrices_left"][layer]
+            )
+            matrices_right.append(
+                self.first_network.matrices_left[layer]
+                + mutation * direction_matrices[0]["matrices_left"][layer]
+            )
+            biases.append(
+                self.first_network.matrices_left[layer]
+                + mutation * direction_matrices[0]["matrices_left"][layer]
+            )
+        scalar_matrices: dict[str, np.ndarray] = {}
+        reduce_matrices: dict[str, np.ndarray] = {}
+        correction: dict[str, np.ndarray] = {}
+        for key, value in direction_matrices[1]["scalar_matrices"].items():
+            scalar_matrices[key] = (
+                self.first_network.scalar_matrices[key] + mutation * value
+            )
+        for key, value in direction_matrices[1]["reduce_matrices"].items():
+            reduce_matrices[key] = (
+                self.first_network.reduce_matrices[key] + mutation * value
+            )
+        for key, value in direction_matrices[1]["correction"].items():
+            correction[key] = (
+                self.first_network.correction[key] + mutation * value
+            )
+        return NeuralNetwork(
             matrices_left,
             matrices_right,
             list(scalar_matrices.values()),
@@ -83,3 +160,30 @@ class Trainer:
             biases,
             tuple(correction.values()),
         )
+
+    def games_loop(self, mutated_networks: list[NeuralNetwork]) -> None:
+        """
+        Play games between original and mutated networks.
+
+        :param NeuralNetwork mutated_network: Mutated networks.
+        """
+        for first_network in range(256):
+            for second_network in range(256):
+                self.play_game(
+                    mutated_networks[first_network],
+                    mutated_networks[second_network],
+                )
+
+    def play_game(
+        self, first_network: NeuralNetwork, second_network: NeuralNetwork
+    ) -> None:
+        """
+        Play a game between two networks.
+
+        :param NeuralNetwork first_network: First network.
+        :param NeuralNetwork second_network: Second network.
+        """
+        for _ in range(1, 4):
+            game: chess.Board = chess.Board()
+            while not game.is_game_over(claim_draw=True):
+                pass
