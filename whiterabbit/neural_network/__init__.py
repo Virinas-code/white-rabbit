@@ -5,6 +5,7 @@ White Rabbit chess engine.
 
 Neural network object.
 """
+import copy
 import random
 from typing import Callable, Type, TypeVar
 
@@ -53,7 +54,9 @@ class NeuralNetwork:
         :param tuple[np.ndarray, np.ndarray] correction: Correction matrice for scalar reduction.
         """
         self.matrices_left: list[np.ndarray] = matrices_left
+        self.saved_matrices_left: list[np.ndarray] = []
         self.matrices_right: list[np.ndarray] = matrices_right
+        self.saved_matrices_right: list[np.ndarray] = []
         self.scalar_matrices: dict[str, np.ndarray] = {
             "R-Gi": scalar_matrices[0],
             "R-Di": scalar_matrices[1],
@@ -70,6 +73,7 @@ class NeuralNetwork:
             "R-G": correction[0],
             "R-D": correction[1],
         }
+        self.new_game()
 
     save: Callable = save_method
     load: classmethod = classmethod(load_method)
@@ -79,6 +83,15 @@ class NeuralNetwork:
         if not isinstance(__o, NeuralNetwork):
             raise NotImplementedError("can only compare two neural networks")
         return networks_equal(__o, self)
+
+    def new_game(self) -> None:
+        """
+        Start a new game.
+
+        Resets correction.
+        """
+        self.saved_matrices_left = copy.deepcopy(self.matrices_left)
+        self.saved_matrices_right = copy.deepcopy(self.matrices_right)
 
     def search(
         self,
@@ -175,6 +188,7 @@ class NeuralNetwork:
         :param np.ndarray input_layer: Input layer.
         :param int iterations: Amount of iterations (depth-like).
         :param bool disable_correction: Disable correction.
+        TODO: Deprecate disable_correction
         :return np.ndarray: Last hidden layer.
         """
         e_layer: np.ndarray = input_layer  # First calculated layer
@@ -219,19 +233,18 @@ class NeuralNetwork:
                     @ hidden_layer
                     @ self.correction["R-D"]
                 )
-                if not disable_correction:
-                    if (
-                        current_rts >= previous_rts
-                        and current_rts - previous_rts >= RTS_DIFF
-                    ):
-                        self.matrices_left[layer_index + 2] -= correction_r
-                        self.matrices_right[layer_index + 2] -= correction_r
-                    if (
-                        previous_rts >= current_rts
-                        and previous_rts - current_rts >= RTS_DIFF
-                    ):
-                        self.matrices_left[layer_index + 2] += correction_r
-                        self.matrices_right[layer_index + 2] += correction_r
+                if (
+                    current_rts >= previous_rts
+                    and current_rts - previous_rts >= RTS_DIFF
+                ):
+                    self.matrices_left[layer_index + 2] -= correction_r
+                    self.matrices_right[layer_index + 2] -= correction_r
+                if (
+                    previous_rts >= current_rts
+                    and previous_rts - current_rts >= RTS_DIFF
+                ):
+                    self.matrices_left[layer_index + 2] += correction_r
+                    self.matrices_right[layer_index + 2] += correction_r
             e_layer = hidden_layer
         e_layer = e_layer.reshape(96, 96)
         output_layer: np.ndarray = (
