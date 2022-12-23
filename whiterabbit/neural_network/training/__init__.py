@@ -270,13 +270,6 @@ class Trainer:
             Round=str(round[0]),
             Board=str(round[1]),
         )
-        file_name = f"games/{str(date)}-{networks_id[0]}_{networks_id[1]}-{round[0]}_{round[1]}.pgn"
-        with open(
-            file_name,
-            "w",
-            encoding="utf-8",
-        ) as file:
-            file.write(str(game_pgn))
         if game.result(claim_draw=True) == "1-0":
             self.progress.console.log(
                 f"[bold green] {networks_id[0]} won vs {networks_id[1]}"
