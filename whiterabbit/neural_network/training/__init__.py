@@ -5,9 +5,8 @@ White Rabbit chess engine.
 
 Base training object.
 """
-from typing import Union
-
 import chess
+import chess.pgn
 import numpy as np
 
 from .. import NeuralNetwork
@@ -45,7 +44,8 @@ class Trainer:
 
         Train networks 1 time.
         """
-        self.generate_dir_matrices()
+        dir_matrices: DirectionMatrices = self.generate_dir_matrices()
+        self.mutations_loop(dir_matrices)
 
     def generate_dir_matrices(
         self,
@@ -124,7 +124,7 @@ class Trainer:
         matrices_left: list[np.ndarray] = []
         matrices_right: list[np.ndarray] = []
         biases: list[np.ndarray] = []
-        for layer in range(HIDDEN_LAYERS):
+        for layer in range(HIDDEN_LAYERS + 2):
             matrices_left.append(
                 self.first_network.matrices_left[layer]
                 + mutation * direction_matrices[0]["matrices_left"][layer]
@@ -183,7 +183,20 @@ class Trainer:
         :param NeuralNetwork first_network: First network.
         :param NeuralNetwork second_network: Second network.
         """
-        for _ in range(1, 4):
+        for depth in range(1, 4):
             game: chess.Board = chess.Board()
             while not game.is_game_over(claim_draw=True):
-                pass
+                if game.turn is chess.WHITE:
+                    game.push(first_network.search(game, depth))
+                else:
+                    game.push(second_network.search(game, depth))
+            self.save_game(game)
+
+    def save_game(self, game: chess.Board) -> None:
+        """
+        Save game.
+
+        :param chess.Board game: Game to save.
+        """
+        game_pgn: chess.pgn.Game = chess.pgn.Game.from_board(game)
+        game_pgn.headers = chess.pgn.Headers()

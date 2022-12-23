@@ -5,6 +5,7 @@ White Rabbit chess engine.
 
 Neural network object.
 """
+import random
 from typing import Callable, Type, TypeVar
 
 import chess
@@ -79,7 +80,13 @@ class NeuralNetwork:
             raise NotImplementedError("can only compare two neural networks")
         return networks_equal(__o, self)
 
-    def search(self, board: chess.Board, depth: int) -> list[chess.Move]:
+    def search(
+        self,
+        board: chess.Board,
+        depth: int,
+        *,
+        disable_correction: bool = False
+    ) -> chess.Move:
         """
         Search best moves in a position.
 
@@ -87,10 +94,13 @@ class NeuralNetwork:
 
         :param chess.Board board: Actual position.
         :param int depth: Search depth.
-        :return list[chess.Move]: Good moves in the position.
+        :param bool disable_correction: Disable correction.
+        :return chess.Move: Good moves in the position.
         """
         input_layer: np.ndarray = self.generate_inputs(board)
-        last_hidden_layer: np.ndarray = self.calculate(input_layer, depth)
+        last_hidden_layer: np.ndarray = self.calculate(
+            input_layer, depth, disable_correction=disable_correction
+        )
         return self.output(board, last_hidden_layer)
 
     @staticmethod
@@ -153,13 +163,18 @@ class NeuralNetwork:
         return np.array(input_layer)
 
     def calculate(
-        self, input_layer: np.ndarray, iterations: int
+        self,
+        input_layer: np.ndarray,
+        iterations: int,
+        *,
+        disable_correction: bool = False
     ) -> np.ndarray:
         """
         Start calculating.
 
         :param np.ndarray input_layer: Input layer.
         :param int iterations: Amount of iterations (depth-like).
+        :param bool disable_correction: Disable correction.
         :return np.ndarray: Last hidden layer.
         """
         e_layer: np.ndarray = input_layer  # First calculated layer
@@ -204,21 +219,21 @@ class NeuralNetwork:
                     @ hidden_layer
                     @ self.correction["R-D"]
                 )
-                if (
-                    current_rts >= previous_rts
-                    and current_rts - previous_rts >= RTS_DIFF
-                ):
-                    self.matrices_left[layer_index + 2] -= correction_r
-                    self.matrices_right[layer_index + 2] -= correction_r
-                if (
-                    previous_rts >= current_rts
-                    and previous_rts - current_rts >= RTS_DIFF
-                ):
-                    self.matrices_left[layer_index + 2] += correction_r
-                    self.matrices_right[layer_index + 2] += correction_r
+                if not disable_correction:
+                    if (
+                        current_rts >= previous_rts
+                        and current_rts - previous_rts >= RTS_DIFF
+                    ):
+                        self.matrices_left[layer_index + 2] -= correction_r
+                        self.matrices_right[layer_index + 2] -= correction_r
+                    if (
+                        previous_rts >= current_rts
+                        and previous_rts - current_rts >= RTS_DIFF
+                    ):
+                        self.matrices_left[layer_index + 2] += correction_r
+                        self.matrices_right[layer_index + 2] += correction_r
             e_layer = hidden_layer
         e_layer = e_layer.reshape(96, 96)
-        print(e_layer.shape)
         output_layer: np.ndarray = (
             self.reduce_matrices["RM-G"]
             @ e_layer
@@ -228,13 +243,13 @@ class NeuralNetwork:
 
     def output(
         self, board: chess.Board, output_layer: np.ndarray
-    ) -> set[chess.Move]:
+    ) -> chess.Move:
         """
         Parse output layer to get best move.
 
         :param chess.Board board: Current position.
         :param np.ndarray output_layer: Output layer from the NN.
-        :return set[chess.Move]: Good moves in the position (unordered).
+        :return chess.Move: Good moves in the position (unordered).
         """
         legal_moves: list[chess.Move] = list(board.legal_moves)
         piece_map: dict[chess.Square, chess.Piece] = board.piece_map()
@@ -248,7 +263,6 @@ class NeuralNetwork:
             bool2_to_int: Callable[[np.ndarray], int] = lambda a: (
                 1 if a[0] else 0
             ) + (2 if a[1] else 0)
-            print(bool2_to_int(line[12:14]) + 1)
             from_rank: int = bool3_to_int(line[0:3])
             to_rank: int = bool3_to_int(line[3:6])
             from_file: int = bool3_to_int(line[6:9])
@@ -261,7 +275,7 @@ class NeuralNetwork:
             )
 
         def is_legal(move: chess.Move) -> bool:
-            """for legal_move in legal_moves:
+            for legal_move in legal_moves:
                 if (
                     legal_move.from_square == move.from_square
                     and legal_move.to_square == move.to_square
@@ -280,8 +294,7 @@ class NeuralNetwork:
                     else:
                         move.promotion = None
                         return True
-            return False"""
-            return True
+            return False
 
         output: np.ndarray = output_layer > 127
         good_moves: list[chess.Move] = []
@@ -289,4 +302,6 @@ class NeuralNetwork:
             move: chess.Move = parse_move(line)
             if is_legal(move):
                 good_moves.append(move)
-        return good_moves
+        if good_moves:
+            return random.choice(good_moves)
+        return random.choice(legal_moves)
