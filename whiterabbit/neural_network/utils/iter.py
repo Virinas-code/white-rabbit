@@ -18,11 +18,11 @@ def network_iter(network) -> Iterator[numpy.ndarray]:
     :return str: Network repr.
     """
     all_matrices: list[numpy.ndarray] = [
-        network.matrices_left,
-        network.matrices_right,
-        network.scalar_matrices,
-        network.reduce_matrices,
-        network.biases,
-        network.correction,
+        *network.matrices_left,
+        *network.matrices_right,
+        *network.scalar_matrices.values(),
+        *network.reduce_matrices.values(),
+        *network.biases,
+        *network.correction.values(),
     ]
     return (matrix for matrix in all_matrices)
