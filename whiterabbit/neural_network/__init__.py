@@ -7,14 +7,16 @@ Neural network object.
 """
 import copy
 import random
-from typing import Callable, Type, TypeVar
+from typing import Callable, Self, Type, TypeVar
 
 import chess
 import numpy as np
 import numpy.lib.npyio
 
 from .utils.equivalence import networks_equal
+from .utils.hash import network_hash
 from .utils.random import random_method
+from .utils.repr import network_repr
 from .utils.save import load_method, save_method
 
 HIDDEN_LAYERS: int = 8  # Amount of hidden layers
@@ -75,9 +77,11 @@ class NeuralNetwork:
         }
         self.new_game()
 
-    save: Callable = save_method
+    save: Callable[[Self, str], None] = save_method
     load: classmethod = classmethod(load_method)
     random: classmethod = classmethod(random_method)
+    __hash__: Callable[[Self], int] = network_hash
+    __repr__: Callable[[Self], str] = network_repr
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NeuralNetwork):
@@ -92,6 +96,15 @@ class NeuralNetwork:
         """
         self.saved_matrices_left = copy.deepcopy(self.matrices_left)
         self.saved_matrices_right = copy.deepcopy(self.matrices_right)
+
+    def game_end(self) -> None:
+        """
+        End current game.
+
+        Resets matrices back.
+        """
+        self.matrices_left = copy.deepcopy(self.saved_matrices_left)
+        self.matrices_right = copy.deepcopy(self.saved_matrices_right)
 
     def search(
         self,

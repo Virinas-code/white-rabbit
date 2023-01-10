@@ -5,20 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "White Rabbit",
-            "type": "python",
-            "request": "launch",
-            "module": "whiterabbit",
-            "justMyCode": true
-        },
-        {
-            "name": "White Rabbit: Training",
+            "name": "Module Python",
             "type": "python",
             "request": "launch",
             "module": "whiterabbit.neural_network.training",
-            "justMyCode": false,
-            "cwd": "${workspaceFolder}",
-            "justMyCode": true
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

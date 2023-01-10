@@ -40,24 +40,24 @@ def load_method(cls, file: str):
     biases: list[np.ndarray] = []
     for matrix in loaded_file:
         if matrix[0:3] == "M-G":
-            matrices_left.append(loaded_file[matrix].astype(np.int8))
+            matrices_left.append(loaded_file[matrix].astype(np.uint8))
         elif matrix[0:3] == "M-D":
-            matrices_right.append(loaded_file[matrix].astype(np.int8))
+            matrices_right.append(loaded_file[matrix].astype(np.uint8))
         elif matrix[0] == "B":
-            biases.append(loaded_file[matrix].astype(np.int8))
+            biases.append(loaded_file[matrix].astype(np.uint8))
     scalar_matrices = [
-        loaded_file["R-Gi"].astype(np.int8),
-        loaded_file["R-Di"].astype(np.int8),
-        loaded_file["R-Ge"].astype(np.int8),
-        loaded_file["R-De"].astype(np.int8),
+        loaded_file["R-Gi"].astype(np.uint8),
+        loaded_file["R-Di"].astype(np.uint8),
+        loaded_file["R-Ge"].astype(np.uint8),
+        loaded_file["R-De"].astype(np.uint8),
     ]
     reduce_matrices: list[np.ndarray] = [
-        loaded_file["RM-G"].astype(np.int8),
-        loaded_file["RM-D"].astype(np.int8),
+        loaded_file["RM-G"].astype(np.uint8),
+        loaded_file["RM-D"].astype(np.uint8),
     ]
     correction: tuple[np.ndarray, np.ndarray] = (
-        loaded_file["R-G"].astype(np.int8),
-        loaded_file["R-D"].astype(np.int8),
+        loaded_file["R-G"].astype(np.uint8),
+        loaded_file["R-D"].astype(np.uint8),
     )
     return cls(
         matrices_left,
