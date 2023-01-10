@@ -716,19 +716,19 @@ files = [
 
 [[package]]
 name = "esbonio"
-version = "0.13.1"
+version = "0.14.1"
 description = "A Language Server for Sphinx projects."
 category = "dev"
 optional = false
 python-versions = "*"
 files = [
-    {file = "esbonio-0.13.1-py3-none-any.whl", hash = "sha256:6058db3a6e64e13225b6bb1334922468e7f2e650252e5fbee929c09ce0f635a2"},
-    {file = "esbonio-0.13.1.tar.gz", hash = "sha256:29c03892dea2ae9aa94e5a941ee6b1d6a5c7810dee622ee9b94d6be9bc422da5"},
+    {file = "esbonio-0.14.1-py3-none-any.whl", hash = "sha256:b83f415070068b396fceb16cff7abf1979e81dea4aadd57daedd6223e45bf795"},
+    {file = "esbonio-0.14.1.tar.gz", hash = "sha256:edbeeb22022472d936769f9fc58b96372f71ae2b490f6d4d12b2f7587cb75051"},
 ]
 
 [package.dependencies]
 appdirs = "*"
-pygls = ">=0.11.0,<0.13.1"
+pygls = ">=0.11.0"
 pyspellchecker = "*"
 sphinx = "*"
 typing-extensions = "*"
@@ -3488,4 +3488,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.9"
-content-hash = "ca9bf5213fdda996750d6fa6b174b19d8b39892e5dfc3f3c1f9bd507de2b53a4"
+content-hash = "405473d4b24334677a85f185cb32aa25fa2763e1a953e16dd1175b08c2723905"

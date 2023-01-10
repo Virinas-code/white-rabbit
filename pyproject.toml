@@ -21,7 +21,7 @@ backoff = "^2.2.1"
 textual = "^0.6.0"
 
 [tool.poetry.dev-dependencies]
-esbonio = "^0.13.1"
+esbonio = "^0.14.1"
 black = "^22.10.0"
 pylint = "^2.15.5"
 mypy = "^0.971"
