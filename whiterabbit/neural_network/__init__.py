@@ -15,6 +15,7 @@ import numpy.lib.npyio
 
 from .utils.equivalence import networks_equal
 from .utils.hash import network_hash
+from .utils.iter import network_iter
 from .utils.random import random_method
 from .utils.repr import network_repr
 from .utils.save import load_method, save_method
@@ -82,6 +83,7 @@ class NeuralNetwork:
     random: classmethod = classmethod(random_method)
     __hash__: Callable[[Self], int] = network_hash
     __repr__: Callable[[Self], str] = network_repr
+    __iter__: Callable[[Self], list[np.ndarray]] = network_iter
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NeuralNetwork):
