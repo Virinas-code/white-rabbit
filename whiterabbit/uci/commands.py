@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 White Rabbit chess engine.
- Flib1301
- 
+
 UCI commands parser.
 """
 import sys
@@ -104,6 +103,7 @@ class Commands:
         Start a new game.
         """
         self.engine.transpositions.clear()
+        self.engine.engine.neural_network.new_game()
 
     def position(self, *args: str) -> None:
         """
@@ -172,7 +172,7 @@ class Commands:
 
         Stop engine thread.
         """
-        self.engine.stop()  # TODO: bestmove
+        self.bestmove(self.engine.stop())
 
     def quit(self) -> None:
         """
@@ -208,6 +208,20 @@ class Commands:
         Tell the GUI that the engine is responding.
         """
         self.send("readyok")
+
+    def bestmove(
+        self, move: chess.Move, ponder: chess.Move | None = None
+    ) -> None:
+        """
+        UCI `bestmove` command.
+
+        :param chess.Move move: Best move returned by engine.
+        :param chess.Move | None ponder: Engine think on opponent's next move.
+        """
+        if ponder:
+            self.send("bestmove", move.uci(), "ponder", ponder.uci())
+        else:
+            self.send("bestmove", move.uci())
 
     def option(self, option: Option) -> None:
         """
