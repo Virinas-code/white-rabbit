@@ -8,6 +8,7 @@ Base training object.
 import datetime
 import os
 import random
+import sys
 
 import chess
 import chess.pgn
@@ -35,6 +36,8 @@ class Trainer:
         self.first_network: NeuralNetwork = NeuralNetwork.load(
             "best_network.npz"
         )
+        if "-r" in sys.argv:
+            self.first_network = NeuralNetwork.random(8)
         self.progress: progress.Progress = progress.Progress(
             progress.SpinnerColumn(),
             *progress.Progress.get_default_columns(),
