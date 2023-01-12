@@ -5,18 +5,24 @@ White Rabbit chess engine.
 
 Main engine.
 """
+import chess
+
 from ..neural_network import NeuralNetwork
+from .evaluation import Evaluation
 
 
 class Engine:
     """Engine class."""
 
-    def __init__(self, neural_network: NeuralNetwork):
+    def __init__(self):
         """
         Initialize engine.
 
         :param NeuralNetwork neural_network: Neural network to use.
         """
-        self.neural_network: NeuralNetwork = neural_network
-    
-    def search(self, position)
+        self.neural_network: NeuralNetwork = NeuralNetwork.load(
+            "best_network.npz"
+        )
+
+    def search(self, position: chess.Board, *, movetime: int) -> Evaluation:
+        
