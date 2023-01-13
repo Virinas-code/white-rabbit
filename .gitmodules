@@ -1,5 +1,6 @@
 [submodule "lichess-bot"]
 	path = lichess-bot
 	url = https://github.com/ShailChoksi/lichess-bot
+	branch = master
 [submodule "lichess-bot/"]
 	branch = master
