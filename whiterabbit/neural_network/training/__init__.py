@@ -208,16 +208,11 @@ class Trainer:
         games_progress: progress.TaskID = self.progress.add_task(
             "[bold red] Playing games", total=4
         )
-        shift: int = random.randint(0, 63)
-        self.progress.print(
-            f"[bold cyan] Starting training with shift {shift}"
-        )
-        for first_network in range(0, 256, 64):
-            if first_network != 0:
-                first_network_shifted: int = min(first_network + shift, 255)
-            else:
-                first_network_shifted = 0
-                # self.progress.console.log("0", mutated_networks[0])
+        # shift: int = random.randint(0, 63)
+        # self.progress.print(f"[bold cyan] Starting training")
+        for first_network in (0, 1, 255):
+            first_network_shifted: int = first_network
+            # self.progress.console.log("0", mutated_networks[0])
             self.progress.update(
                 games_progress,
                 description=f"[bold red] Matchmaking [italic]{hash(mutated_networks[first_network])}",
@@ -225,13 +220,8 @@ class Trainer:
             second_progress: progress.TaskID = self.progress.add_task(
                 "[red] Playing games", total=3
             )
-            for second_network in range(0, 256, 64):
-                if second_network != 0:
-                    second_network_shifted: int = min(
-                        second_network + shift, 255
-                    )
-                else:
-                    second_network_shifted = 0
+            for second_network in (0, 1, 255):
+                second_network_shifted: int = second_network
                 # self.progress.console.log(mutated_networks[0])
                 if first_network_shifted != second_network_shifted:
                     self.progress.update(
@@ -270,10 +260,10 @@ class Trainer:
         :return tuple[int, int]: Each network score.
         """
         depth_progress: progress.TaskID = self.progress.add_task(
-            "[bold blue] Testing networks", total=3
+            "[bold blue] Testing networks", total=2
         )
         result: list[int] = [0, 0]
-        for depth in range(1, 4):
+        for depth in range(1, 3):
             first_network.new_game()
             second_network.new_game()
             game: chess.Board = chess.Board()
@@ -354,12 +344,12 @@ class Trainer:
         results: dict[int, int] = {}
         best_network_score: int = 0
         best_network: NeuralNetwork = networks[0]
-        for neural_network_index in range(0, 256, 64):
+        for neural_network_index in (0, 1, 255):
             if neural_network_index != 0:
-                neural_network: int = neural_network_index + shift
+                neural_network: int = neural_network_index
             else:
                 neural_network: int = 0
-                # self.progress.console.log(networks[neural_network])
+            assert neural_network == neural_network_index, "WTF"
             if self.networks_result[neural_network] > best_network_score:
                 best_network_score = self.networks_result[neural_network]
                 best_network = networks[neural_network]

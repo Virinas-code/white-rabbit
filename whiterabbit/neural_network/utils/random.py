@@ -19,7 +19,7 @@ def random_method(cls, maximum: int = 255):
     matrices_left: list[np.ndarray] = []
     matrices_right: list[np.ndarray] = []
     biases: list[np.ndarray] = []
-    for layer in range(HIDDEN_LAYERS + 2):
+    for _ in range(HIDDEN_LAYERS + 2):
         matrices_left.append(
             np.random.randint(0, maximum, (8, 8, 12, 12)).astype(np.uint8)
         )
