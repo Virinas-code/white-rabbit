@@ -78,7 +78,7 @@ class NeuralNetwork:
         }
         self.new_game()
 
-    save: Callable[[Self, str], None] = save_method
+    save: Callable = save_method
     load: classmethod = classmethod(load_method)
     random: classmethod = classmethod(random_method)
     __hash__: Callable[[Self], int] = network_hash

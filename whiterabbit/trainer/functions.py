@@ -5,8 +5,10 @@ White Rabbit Chess Engine.
 
 Training algorithm functions.
 """
+import chess
 import numpy as np
 
+from .config import DEPTHS
 from ..neural_network import HIDDEN_LAYERS, NeuralNetwork
 
 
@@ -101,3 +103,57 @@ def gen_mutated_network(self, mutation: int) -> NeuralNetwork:
         biases,
         (correction["R-G"], correction["R-D"]),
     )
+
+
+def func_play_game(self, first_index: int, second_index: int) -> None:
+    """
+    Play games between two networks.
+
+    :param int first_index: First network index.
+    :param int second_index: Second network index.
+    """
+    first_network: NeuralNetwork = self.mutated_networks[first_index]
+    second_network: NeuralNetwork = self.mutated_networks[second_index]
+    self.cli.init_game()
+    for depth in DEPTHS:
+        self.core_play_game(first_network, second_network, depth)
+        self.cli.game_iteration()
+    self.cli.end_game()
+
+
+def func_core_play_game(
+    self,
+    first_network: NeuralNetwork,
+    second_network: NeuralNetwork,
+    depth: int,
+) -> None:
+    """
+    Play a game between two networks.
+
+    :param NeuralNetwork first_network: First network.
+    :param NeuralNetwork second_network: Second network.
+    :param int depth: Depth to play at.
+    """
+    first_network.new_game()
+    second_network.new_game()
+    game: chess.Board = chess.Board()
+    while not game.is_game_over(claim_draw=True):
+        if game.turn is chess.WHITE:
+            game.push(first_network.search(game, depth))
+        else:
+            game.push(second_network.search(game, depth))
+    first_network.game_end()
+    second_network.game_end()
+    outcome: chess.Outcome = game.outcome(claim_draw=True)  # type: ignore
+    if outcome.result() == "1/2-1/2":  # Draw, +1*depth to each
+        self.scores[hash(first_network)] = (
+            self.scores.get(hash(first_network), 0) + depth * 1
+        )
+        self.scores[hash(second_network)] = (
+            self.scores.get(hash(second_network), 0) + depth * 1
+        )
+    else:  # Win, +3*depth to winner
+        winner_hash = hash(first_network)
+        if outcome.winner is chess.BLACK:
+            winner_hash = hash(second_network)
+        self.scores[winner_hash] = self.scores.get(winner_hash, 0) + depth * 3
