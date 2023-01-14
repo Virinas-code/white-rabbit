@@ -6,13 +6,14 @@ White Rabbit Chess Engine.
 Base training algorithm (v2).
 """
 import sys
-from typing import TypeAlias
+from typing import Callable, TypeAlias
 
 import numpy as np
 
-from ..neural_network import HIDDEN_LAYERS, NeuralNetwork
+from ..neural_network import NeuralNetwork
 from .cli import TrainerCLI
 from .config import NETWORKS_INDEXES_PLAYING
+from .functions import gen_direction_matrices, gen_mutated_network
 
 NetworkID: TypeAlias = int
 """A network hash."""
@@ -42,6 +43,9 @@ class Trainer:
 
         self.cli: TrainerCLI = TrainerCLI()
         """CLI object."""
+
+    generate_direction_matrices: Callable = gen_direction_matrices
+    generate_mutated_network: Callable = gen_mutated_network
 
     def _gen_first_network(self) -> NeuralNetwork:
         """
@@ -81,52 +85,6 @@ class Trainer:
         self.game_loop()
         self.fetch_results()
 
-    def generate_direction_matrices(self) -> None:
-        """
-        Generate direction matrices.
-
-        Matrices are stored in self.direction_matrices.
-        """
-        matrices_left: list[np.ndarray] = []
-        matrices_right: list[np.ndarray] = []
-        biases: list[np.ndarray] = []
-        for _ in range(HIDDEN_LAYERS + 2):
-            matrices_left.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-            matrices_right.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-            biases.append(
-                np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
-            )
-        scalar_matrices: dict[str, np.ndarray] = {
-            "R-Gi": np.random.randint(0, 255, (8, 8, 1, 12)).astype(np.uint8),
-            "R-Di": np.random.randint(0, 255, (8, 8, 12, 1)).astype(np.uint8),
-            "R-Ge": np.random.randint(0, 255, (1, 8, 1, 1)).astype(np.uint8),
-            "R-De": np.random.randint(0, 255, (8, 1, 1, 1)).astype(np.uint8),
-        }
-        reduce_matrices: dict[str, np.ndarray] = {
-            "RM-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
-            "RM-D": np.random.randint(0, 255, (96, 14)).astype(np.uint8),
-        }
-        correction: dict[str, np.ndarray] = {
-            "R-G": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
-            "R-D": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
-        }
-        self.direction_matrices = (
-            {
-                "matrices_left": matrices_left,
-                "matrices_right": matrices_right,
-                "biases": biases,
-            },
-            {
-                "scalar_matrices": scalar_matrices,
-                "reduce_matrices": reduce_matrices,
-                "correction": correction,
-            },
-        )
-
     def generate_networks(self) -> None:
         """
         Generate mutated networks.
@@ -136,7 +94,9 @@ class Trainer:
         """
         self.cli.init_network_gen()
         self.mutated_networks = []
-        for _ in range(len(NETWORKS_INDEXES_PLAYING) - 1):
+        for mutation_index in range(len(NETWORKS_INDEXES_PLAYING) - 1):
             self.cli.network_gen_iteration()
-            self.mutated_networks.append(self.generate_mutated_network())
+            self.mutated_networks.append(
+                self.generate_mutated_network(mutation_index)
+            )
         self.cli.end_network_gen()

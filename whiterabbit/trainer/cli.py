@@ -12,6 +12,8 @@ from .config import DEPTHS, NETWORKS_INDEXES_PLAYING
 class TrainerCLI:
     """CLI for training."""
 
+    generate_networks_progress: progress.TaskID
+
     def __init__(self):
         """
         Initializes all progress bars.
@@ -31,9 +33,6 @@ class TrainerCLI:
         self.games_progress: progress.TaskID = self._games_progress()
         self.second_progress: progress.TaskID = self._second_progress()
         self.depth_progress: progress.TaskID = self._depth_progress()
-        self.generate_networks_progress: progress.TaskID = (
-            self._generate_networks_progress()
-        )
 
     def _main_progress(self) -> progress.TaskID:
         return self.progress.add_task("[bold green] Training...", total=None)
@@ -82,3 +81,27 @@ class TrainerCLI:
         self.general_progress = self._general_progress()
         self.games_progress = self._games_progress()
         self.second_progress = self._second_progress()
+
+    def init_network_gen(self) -> None:
+        """
+        Initialize network generation.
+
+        Adds the network generation task.
+        """
+        self.generate_networks_progress = self._generate_networks_progress()
+
+    def network_gen_iteration(self) -> None:
+        """
+        Update network initialization progress bar.
+
+        Just adds 1.
+        """
+        self.progress.update(self.generate_networks_progress, advance=1)
+
+    def end_network_gen(self) -> None:
+        """
+        End of network generation.
+
+        Removes progress bar.
+        """
+        self.progress.remove_task(self.generate_networks_progress)
