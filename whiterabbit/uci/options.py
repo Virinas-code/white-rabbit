@@ -5,7 +5,7 @@ White Rabbit chess engine.
 
 UCI options.
 """
-from typing import Callable
+from typing import Any, Callable
 
 
 TYPES: dict[str, str] = {
@@ -28,7 +28,7 @@ class Option:
         """
         self.name: str = name
         """Option name."""
-        self.value: None = None
+        self.value: Any = None
         """Option value."""
 
     def set(self, value: str) -> bool:

@@ -16,7 +16,7 @@ class Evaluation:
         depth: int,
         time: int,
         nodes: int,
-        pv: list[chess.Move],
+        best_moves: list[chess.Move],
         score: tuple[int, int],
         hash_full: int,
         nps: int,
@@ -39,10 +39,10 @@ class Evaluation:
         self.depth: int = depth
         """Search depth."""
         self.time: int = time
-        """Time"""  # TODO: Infos from TCEC's Discod
+        """Time"""
         self.nodes: int = nodes
         """Number of nodes searched."""
-        self.pv: list[chess.Move] = pv
+        self.best_moves: list[chess.Move] = best_moves
         """PVs."""
         self.score: tuple[int, int] = score
         """Centipawns and mate score."""
@@ -64,8 +64,11 @@ class Evaluation:
 
         :param int multi_pv: MultiPV value.
         """
-        for multipv, move in enumerate(self.pv):
+        for multipv, move in enumerate(self.best_moves):
             if multipv < multi_pv:
+                score: str = f"cp {self.score[0]}"
+                if self.score[1] > 0:
+                    score = f"mate {self.score[1]}"
                 print(
                     "info",
                     "depth",
@@ -80,4 +83,14 @@ class Evaluation:
                     move.uci(),
                     "multipv",
                     multipv + 1,
+                    "score",
+                    score,
+                    "hashfull",
+                    self.hash_full,
+                    "nps",
+                    self.nps,
+                    "tbhits",
+                    self.tbhits,
+                    "cpuload",
+                    self.cpuload,
                 )

@@ -10,6 +10,7 @@ import sys
 import chess
 from .options import ButtonOption, Option
 from .engine import Engine
+from ..engine.evaluation import Evaluation
 
 
 class Commands:
@@ -223,11 +224,50 @@ class Commands:
         else:
             self.send("bestmove", move.uci())
 
+    def info(self, info: Evaluation) -> None:
+        """
+        UCI `info` command.
+
+        Shows engine search status.
+
+        :param Evaluation info: Data.
+        """
+        for multipv, move in enumerate(info.best_moves):
+            if multipv < int(self.engine.options["MultiPV"].value):
+                score: str = f"cp {info.score[0]}"
+                if info.score[1] > 0:
+                    score = f"mate {info.score[1]}"
+                self.send(
+                    "info",
+                    "depth",
+                    str(info.depth),
+                    "seldepth",
+                    str(info.depth),
+                    "time",
+                    str(info.time),
+                    "nodes",
+                    str(info.nodes),
+                    "pv",
+                    move.uci(),
+                    "multipv",
+                    str(multipv + 1),
+                    "score",
+                    score,
+                    "hashfull",
+                    str(info.hash_full),
+                    "nps",
+                    str(info.nps),
+                    "tbhits",
+                    str(info.tbhits),
+                    "cpuload",
+                    str(info.cpuload),
+                )
+
     def option(self, option: Option) -> None:
         """
         UCI `option` command.
 
-        Sho informations about an option.
+        Shows informations about an option.
 
         :param Option option: Option object to display.
         """
