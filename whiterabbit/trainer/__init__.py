@@ -6,7 +6,7 @@ White Rabbit Chess Engine.
 Base training algorithm (v2).
 """
 import sys
-from typing import Callable, TypeAlias
+from typing import Callable, Literal, Union, TypeAlias
 
 import numpy as np
 
@@ -24,6 +24,9 @@ NetworkID: TypeAlias = int
 """A network hash."""
 Score: TypeAlias = int
 """Score of a network."""
+NetworkSource: TypeAlias = Union[
+    Literal["Random"], Literal["Mutation"], Literal["First"]
+]
 
 
 class Trainer:
@@ -51,6 +54,14 @@ class Trainer:
 
         # Red / green
         self.previous_winner: int = hash(self.first_network)
+
+        # Stats
+        self.networks_sources: dict[NetworkID, NetworkSource] = {}
+        self.stats: dict[NetworkSource, int] = {
+            "Random": 0,
+            "Mutation": 0,
+            "First": 0,
+        }
 
     generate_direction_matrices: Callable = gen_direction_matrices
     generate_mutated_network: Callable = gen_mutated_network
@@ -101,10 +112,35 @@ class Trainer:
                 self.train()
 
                 self.scores = {}  # reset scores
+                self.networks_sources = {}  # reset sources
         except KeyboardInterrupt:
             previous_winner_id: NetworkID = hash(self.previous_winner)
             self.cli.print(
-                "[bold magenta]Saved network "
+                "[bold blue] • Training interrupted[not bold] (Ctrl + C)"
+            )
+            self.cli.print(
+                "[bold cyan]Ending training session "
+                + f"[not bold]({training_iterations} iterations)"
+            )
+            self.cli.print("[bold yellow]Statistics:")
+            if not sum(self.stats.values()) > 0:
+                self.cli.print("[yellow] No statistics available.")
+                self.cli.clear()
+                sys.exit(-1)
+            self.cli.print(
+                "[yellow] - Random: "
+                + f"{self.stats['Random'] / sum(self.stats.values()) * 100}%"
+            )
+            self.cli.print(
+                "[yellow] - Mutation: "
+                + f"{self.stats['Mutation'] / sum(self.stats.values()) * 100}%"
+            )
+            self.cli.print(
+                "[yellow] - First: "
+                + f"{self.stats['First'] / sum(self.stats.values()) * 100}%"
+            )
+            self.cli.print(
+                "[bold magenta]Last saved network "
                 + f"[not bold magenta on gray23] #{previous_winner_id} "
             )
             self.cli.clear()
@@ -133,13 +169,18 @@ class Trainer:
             self.first_network,
             *([NeuralNetwork.random()] * 256),
         ]
+        self.networks_sources[hash(self.first_network)] = "First"
         for mutation_index in NETWORKS_INDEXES_PLAYING:
             self.cli.network_gen_iteration()
             if mutation_index != 0:
                 mutated_networks[
                     mutation_index
                 ] = self.generate_mutated_network(mutation_index)
+                self.networks_sources[
+                    hash(mutated_networks[mutation_index])
+                ] = "Mutation"
         mutated_networks[256] = NeuralNetwork.random()
+        self.networks_sources[hash(mutated_networks[256])] = "Random"
         self.mutated_networks = mutated_networks
         self.cli.end_network_gen()
 
@@ -185,8 +226,11 @@ class Trainer:
         if best_network_id != self.previous_winner:
             self.previous_winner = best_network_id
             color = "red"
+        self.stats[self.networks_sources[best_network_id]] += 1
         infos: str = (
-            f"[bold {color}] • Saved #{hash(best_network)} "
+            f"[bold {color}] • Saved [{color} on gray23] #{hash(best_network)}"
+            + f"[{self.networks_sources[best_network_id].upper()}]"
+            + f" [{color} on default] "
             + f"[not bold]({string})"
         )
         self.cli.print(infos)
