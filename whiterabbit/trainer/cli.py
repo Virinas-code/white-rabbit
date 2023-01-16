@@ -8,13 +8,14 @@ from typing import Any
 
 from rich import progress
 
-from .config import DEPTHS, NETWORKS_INDEXES_PLAYING
+from .config import DEPTHS, NETWORKS_INDEXES_PLAYING, POSITIONS
 
 
 class TrainerCLI:
     """CLI for training."""
 
     generate_networks_progress: progress.TaskID
+    lock_progress: progress.TaskID
     depth_progress: progress.TaskID
 
     def __init__(self):
@@ -44,7 +45,8 @@ class TrainerCLI:
             "[green] Training completion",
             total=len(NETWORKS_INDEXES_PLAYING)
             * (len(NETWORKS_INDEXES_PLAYING) - 1)
-            * len(DEPTHS),
+            * len(DEPTHS)
+            * len(POSITIONS),
         )
 
     def _games_progress(self) -> progress.TaskID:
@@ -59,7 +61,7 @@ class TrainerCLI:
 
     def _depth_progress(self) -> progress.TaskID:
         return self.progress.add_task(
-            "[bold blue] Testing networks", total=len(DEPTHS)
+            "[bold blue] Testing networks", total=len(DEPTHS) * len(POSITIONS)
         )
 
     def _generate_networks_progress(self) -> progress.TaskID:
@@ -67,6 +69,9 @@ class TrainerCLI:
             "[blue] Generating networks",
             total=len(NETWORKS_INDEXES_PLAYING) - 1,
         )  # -1 for first network
+
+    def _lock_progress(self) -> progress.TaskID:
+        return self.progress.add_task("[blue] Acquiring lock...", total=None)
 
     def training_iteration(self, iteration: int) -> None:
         """
@@ -210,3 +215,19 @@ class TrainerCLI:
         except KeyError:
             pass
         self.progress.stop()
+
+    def lock_start(self) -> None:
+        """
+        Start lock wait.
+
+        Displays lock progress.
+        """
+        self.lock_progress = self._lock_progress()
+
+    def lock_end(self) -> None:
+        """
+        End lock wait.
+
+        Hides lock progress.
+        """
+        self.progress.remove_task(self.lock_progress)

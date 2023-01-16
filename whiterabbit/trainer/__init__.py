@@ -5,9 +5,12 @@ White Rabbit Chess Engine.
 
 Base training algorithm (v2).
 """
+import hashlib
+import json
 import sys
 from typing import Callable, Literal, Union, TypeAlias
 
+from filelock import FileLock
 import numpy as np
 
 from ..neural_network import NeuralNetwork
@@ -63,10 +66,55 @@ class Trainer:
             "First": 0,
         }
 
+        # Lock file
+        self.lock: FileLock = FileLock("data/training/training.lock")
+
     generate_direction_matrices: Callable = gen_direction_matrices
     generate_mutated_network: Callable = gen_mutated_network
     play_game: Callable = func_play_game
     core_play_game: Callable = func_core_play_game
+
+    def _load_stats(self) -> dict[NetworkSource, int]:
+        """
+        Load stats.
+
+        :return dict[NetworkSource, int]: Loaded stats.
+        """
+        with open(
+            "data/training/statistics.json", "r", encoding="utf-8"
+        ) as file:
+            data: dict[str, dict[NetworkSource, int]] = json.load(file)
+        with open("whiterabbit/trainer/config.py", "rb") as file:
+            checksum: str = hashlib.sha256(file.read()).hexdigest()
+        if checksum in data:
+            return data[checksum]
+        return {
+            "Random": 0,
+            "Mutation": 0,
+            "First": 0,
+        }
+
+    def _save_stats(self) -> None:
+        """
+        Save stats.
+
+        Saved into data/training/statistics.json.
+        """
+        with open("whiterabbit/trainer/config.py", "rb") as file:
+            checksum: str = hashlib.sha256(file.read()).hexdigest()
+        with open(
+            "data/training/statistics.json", "r+", encoding="utf-8"
+        ) as file:
+            data: dict[str, dict[NetworkSource, int]] = json.load(file)
+            if checksum in data:
+                for source, score in self.stats.items():
+                    data[checksum][source] += score
+            else:
+                data[checksum] = {}
+                for source, score in self.stats.items():
+                    data[checksum][source] = score
+            file.seek(0)
+            json.dump(data, file)
 
     def _gen_first_network(self) -> NeuralNetwork:
         """
@@ -88,6 +136,16 @@ class Trainer:
         )
         return loaded_network
 
+    def _acquire_lock(self) -> None:
+        """
+        Acquire lock.
+
+        Lock is stored in data/training/training.lock.
+        """
+        self.cli.lock_start()
+        self.lock.acquire()
+        self.cli.lock_end()
+
     def main_loop(self) -> None:
         """
         Training main loop.
@@ -104,6 +162,8 @@ class Trainer:
             f"[bold cyan]Starting training session [not bold]{infos}"
         )
 
+        self._acquire_lock()
+
         try:
             while True:
                 training_iterations += 1
@@ -116,13 +176,11 @@ class Trainer:
         except KeyboardInterrupt:
             previous_winner_id: NetworkID = hash(self.previous_winner)
             self.cli.print(
-                "[bold blue] • Training interrupted[not bold] (Ctrl + C)"
-            )
-            self.cli.print(
                 "[bold cyan]Ending training session "
                 + f"[not bold]({training_iterations} iterations)"
             )
             self.cli.print("[bold yellow]Statistics:")
+            self._save_stats()
             if not sum(self.stats.values()) > 0:
                 self.cli.print("[yellow] No statistics available.")
                 self.cli.clear()
@@ -144,6 +202,7 @@ class Trainer:
                 + f"[not bold magenta on gray23] #{previous_winner_id} "
             )
             self.cli.clear()
+            self.lock.release()
             sys.exit(0)
 
     def train(self) -> None:
@@ -222,10 +281,12 @@ class Trainer:
                 best_network = mutated_network
         best_network.save("data/training/best-network.npz")
         self.first_network = best_network
-        color: str = "green"
-        if best_network_id != self.previous_winner:
-            self.previous_winner = best_network_id
-            color = "red"
+        colors: dict[NetworkSource, str] = {
+            "Random": "red",
+            "Mutation": "blue",
+            "First": "green",
+        }
+        color: str = colors[self.networks_sources[best_network_id]]
         self.stats[self.networks_sources[best_network_id]] += 1
         infos: str = (
             f"[bold {color}] • Saved [{color} on gray23] #{hash(best_network)}"
