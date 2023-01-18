@@ -15,7 +15,7 @@ import numpy as np
 
 from ..neural_network import NeuralNetwork
 from .cli import TrainerCLI
-from .config import DEPTHS, NETWORKS_INDEXES_PLAYING
+from .config import DEPTHS, NETWORKS_INDEXES_PLAYING, RANDOM_MAXIMUM
 from .functions import (
     func_core_play_game,
     func_play_game,
@@ -126,7 +126,7 @@ class Trainer:
         :return NeuralNetwork: First neural network.
         """
         if "-r" in sys.argv:
-            return NeuralNetwork.random()
+            return NeuralNetwork.random(RANDOM_MAXIMUM)
         loaded_network: NeuralNetwork = NeuralNetwork.load(
             "data/training/best-network.npz"
         )
@@ -145,6 +145,14 @@ class Trainer:
         self.cli.lock_start()
         self.lock.acquire()
         self.cli.lock_end()
+
+    def _calc_mut_stat(self) -> float:
+        muts_amount: int = len(NETWORKS_INDEXES_PLAYING)
+        muts_amount -= NETWORKS_INDEXES_PLAYING.count(0)
+        muts_amount -= NETWORKS_INDEXES_PLAYING.count(256)
+        return (
+            self.stats["Random"] / sum(self.stats.values()) * 100 / muts_amount
+        )
 
     def main_loop(self) -> None:
         """
@@ -190,8 +198,7 @@ class Trainer:
                 + f"{self.stats['Random'] / sum(self.stats.values()) * 100}%"
             )
             self.cli.print(
-                "[yellow] - Mutation: "
-                + f"{self.stats['Mutation'] / sum(self.stats.values()) * 100}%"
+                "[yellow] - Mutation: " + f"{self._calc_mut_stat()}%"
             )
             self.cli.print(
                 "[yellow] - First: "
