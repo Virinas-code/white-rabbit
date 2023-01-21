@@ -7,12 +7,13 @@ Neural network object.
 """
 import copy
 import random
-from typing import Callable, Self, Type, TypeVar
+from typing import Callable, Self, Iterator, TypeVar
 
 import chess
 import numpy as np
 import numpy.lib.npyio
 
+from .config import HIDDEN_LAYERS, NORMALISATION, RTS_DIFF
 from .utils.equivalence import networks_equal
 from .utils.hash import network_hash
 from .utils.iter import network_iter
@@ -20,8 +21,6 @@ from .utils.random import random_method
 from .utils.repr import network_repr
 from .utils.save import load_method, save_method
 
-HIDDEN_LAYERS: int = 8  # Amount of hidden layers
-RTS_DIFF: int = 12
 PIECES_VALUES: dict[chess.PieceType, int] = {
     chess.PAWN: 0,
     chess.KNIGHT: 1,
@@ -31,7 +30,7 @@ PIECES_VALUES: dict[chess.PieceType, int] = {
     chess.KING: 5,
 }
 
-NeuralNetworkType: Type = TypeVar("NeuralNetworkType", bound="NeuralNetwork")
+NeuralNetworkType = TypeVar("NeuralNetworkType", bound="NeuralNetwork")
 """Neural network type annotation."""
 
 
@@ -54,7 +53,8 @@ class NeuralNetwork:
         :param list[np.ndarray] scalar_matrices: Reduce to scalar matrices.
         :param list[np.ndarray] reduce_matrices: Reduction matrices.
         :param list[np.ndarray] biases: Biases matrices.
-        :param tuple[np.ndarray, np.ndarray] correction: Correction matrice for scalar reduction.
+        :param tuple[np.ndarray, np.ndarray] correction: Correction matrice
+            for scalar reduction.
         """
         self.matrices_left: list[np.ndarray] = matrices_left
         self.saved_matrices_left: list[np.ndarray] = []
@@ -83,7 +83,7 @@ class NeuralNetwork:
     random: classmethod = classmethod(random_method)
     __hash__: Callable[[Self], int] = network_hash
     __repr__: Callable[[Self], str] = network_repr
-    __iter__: Callable[[Self], list[np.ndarray]] = network_iter
+    __iter__: Callable[[Self], Iterator[np.ndarray]] = network_iter
 
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, NeuralNetwork):
@@ -107,6 +107,16 @@ class NeuralNetwork:
         """
         self.matrices_left = copy.deepcopy(self.saved_matrices_left)
         self.matrices_right = copy.deepcopy(self.saved_matrices_right)
+
+    def normalise(self, matrix: np.ndarray) -> np.ndarray:
+        """
+        Normalise hidden layer.
+
+        :param np.ndarray matrix: Matrix to normalise.
+        :return np.ndarray: Normalised matrix.
+        """
+        maxed_matrix: np.ndarray = np.full(matrix.shape, NORMALISATION)
+        return np.maximum(maxed_matrix, matrix).astype(np.uint8)
 
     def search(
         self,
@@ -208,7 +218,7 @@ class NeuralNetwork:
         """
         e_layer: np.ndarray = input_layer  # First calculated layer
         # TODO: Pre-init
-        for iteration in range(iterations):
+        for _ in range(iterations):
             hidden_layer1: np.ndarray = (
                 self.matrices_left[0] @ e_layer @ self.matrices_right[0]
                 + self.biases[0]
@@ -227,7 +237,7 @@ class NeuralNetwork:
                 )[0][0]
             )
             for layer_index in range(HIDDEN_LAYERS):
-                hidden_layer = (
+                hidden_layer = self.normalise(
                     self.matrices_left[layer_index + 1]
                     @ previous_hidden_layer
                     @ self.matrices_right[layer_index + 1]

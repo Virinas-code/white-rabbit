@@ -4,8 +4,16 @@ White Rabbit Chess Engine.
 
 Constants config.
 """
-NETWORKS_INDEXES_PLAYING: list[int] = [0, 2, 254, 256]
-DEPTHS: list[int] = [3]
+NETWORKS_INDEXES_PLAYING: list[int] = [
+    0,
+    1,
+    2,
+    3,
+    252,
+    254,
+    255,
+]
+DEPTHS: list[int] = [2]
 POSITIONS: list[str] = [
     "8/5K1k/8/8/8/8/8/R7 w - - 0 1",
     "1k6/8/1K6/8/8/8/8/7R w - - 0 1",
@@ -13,5 +21,10 @@ POSITIONS: list[str] = [
     "8/7k/8/8/1R6/3K4/8/6R1 w - - 0 1",
     "3R4/6K1/8/8/1k6/8/4R3/8 w - - 0 1",
     "6k1/3Q4/7K/8/8/8/8/8 w - - 0 1",
+    "1k6/7R/4K3/8/8/8/8/8 w - - 0 1",
+    "8/6R1/5K1k/8/8/8/8/8 w - - 0 1",
+    "8/8/8/8/8/4K3/4R3/3k4 w - - 0 1",
+    "2K5/k7/8/8/8/8/8/1R6 w - - 0 1",
 ]
-RANDOM_MAXIMUM: int = 4
+RANDOM_MAXIMUM: int = 8
+DIR_PROB: tuple[float, float] = (0.995, 0.005)

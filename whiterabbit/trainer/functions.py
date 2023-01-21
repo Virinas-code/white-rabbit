@@ -8,7 +8,7 @@ Training algorithm functions.
 import chess
 import numpy as np
 
-from .config import DEPTHS, POSITIONS
+from .config import DEPTHS, DIR_PROB, POSITIONS
 from ..neural_network import HIDDEN_LAYERS, NeuralNetwork
 
 
@@ -23,27 +23,49 @@ def gen_direction_matrices(self) -> None:
     biases: list[np.ndarray] = []
     for _ in range(HIDDEN_LAYERS + 2):
         matrices_left.append(
-            np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
+            np.random.choice((0, 1), (8, 8, 12, 12), p=DIR_PROB).astype(
+                np.uint8
+            )
         )
         matrices_right.append(
-            np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
+            np.random.choice((0, 1), (8, 8, 12, 12), p=DIR_PROB).astype(
+                np.uint8
+            )
         )
         biases.append(
-            np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8)
+            np.random.choice((0, 1), (8, 8, 12, 12), p=DIR_PROB).astype(
+                np.uint8
+            )
         )
     scalar_matrices: dict[str, np.ndarray] = {
-        "R-Gi": np.random.randint(0, 255, (8, 8, 1, 12)).astype(np.uint8),
-        "R-Di": np.random.randint(0, 255, (8, 8, 12, 1)).astype(np.uint8),
-        "R-Ge": np.random.randint(0, 255, (1, 8, 1, 1)).astype(np.uint8),
-        "R-De": np.random.randint(0, 255, (8, 1, 1, 1)).astype(np.uint8),
+        "R-Gi": np.random.choice((0, 1), (8, 8, 1, 12), p=DIR_PROB).astype(
+            np.uint8
+        ),
+        "R-Di": np.random.choice((0, 1), (8, 8, 12, 1), p=DIR_PROB).astype(
+            np.uint8
+        ),
+        "R-Ge": np.random.choice((0, 1), (1, 8, 1, 1), p=DIR_PROB).astype(
+            np.uint8
+        ),
+        "R-De": np.random.choice((0, 1), (8, 1, 1, 1), p=DIR_PROB).astype(
+            np.uint8
+        ),
     }
     reduce_matrices: dict[str, np.ndarray] = {
-        "RM-G": np.random.randint(0, 255, (16, 96)).astype(np.uint8),
-        "RM-D": np.random.randint(0, 255, (96, 14)).astype(np.uint8),
+        "RM-G": np.random.choice((0, 1), (16, 96), p=DIR_PROB).astype(
+            np.uint8
+        ),
+        "RM-D": np.random.choice((0, 1), (96, 14), p=DIR_PROB).astype(
+            np.uint8
+        ),
     }
     correction: dict[str, np.ndarray] = {
-        "R-G": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
-        "R-D": np.random.randint(0, 255, (8, 8, 12, 12)).astype(np.uint8),
+        "R-G": np.random.choice((0, 1), (8, 8, 12, 12), p=DIR_PROB).astype(
+            np.uint8
+        ),
+        "R-D": np.random.choice((0, 1), (8, 8, 12, 12), p=DIR_PROB).astype(
+            np.uint8
+        ),
     }
     self.direction_matrices = (
         {

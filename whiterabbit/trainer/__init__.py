@@ -5,15 +5,19 @@ White Rabbit Chess Engine.
 
 Base training algorithm (v2).
 """
+from __future__ import annotations
+
 import hashlib
 import json
 import sys
-from typing import Callable, Literal, Union, TypeAlias
+from types import MethodType
+from typing import Callable, ClassVar, Literal, Self, Union, TypeAlias
 
 from filelock import FileLock
 import numpy as np
 
 from ..neural_network import NeuralNetwork
+from ..types import Method
 from .cli import TrainerCLI
 from .config import DEPTHS, NETWORKS_INDEXES_PLAYING, RANDOM_MAXIMUM
 from .functions import (
@@ -22,6 +26,8 @@ from .functions import (
     gen_direction_matrices,
     gen_mutated_network,
 )
+from .lock import func_acquire_lock
+from .stats import func_update_stats
 
 NetworkID: TypeAlias = int
 """A network hash."""
@@ -65,6 +71,11 @@ class Trainer:
             "Mutation": 0,
             "First": 0,
         }
+        self.stats_graph: dict[str, list[float]] = {
+            "med": [],
+            "mea": [],
+            "ete": [],
+        }
 
         # Lock file
         self.lock: FileLock = FileLock("data/training/training.lock")
@@ -73,6 +84,10 @@ class Trainer:
     generate_mutated_network: Callable = gen_mutated_network
     play_game: Callable = func_play_game
     core_play_game: Callable = func_core_play_game
+
+    acquire_lock: MethodType = func_acquire_lock
+
+    update_stats: Callable = func_update_stats
 
     def _load_stats(self) -> dict[NetworkSource, int]:
         """
@@ -136,16 +151,6 @@ class Trainer:
         )
         return loaded_network
 
-    def _acquire_lock(self) -> None:
-        """
-        Acquire lock.
-
-        Lock is stored in data/training/training.lock.
-        """
-        self.cli.lock_start()
-        self.lock.acquire()
-        self.cli.lock_end()
-
     def _calc_mut_stat(self) -> float:
         muts_amount: int = len(NETWORKS_INDEXES_PLAYING)
         muts_amount -= NETWORKS_INDEXES_PLAYING.count(0)
@@ -170,7 +175,7 @@ class Trainer:
             f"[bold cyan]Starting training session [not bold]{infos}"
         )
 
-        self._acquire_lock()
+        self.acquire_lock()
 
         try:
             while True:
@@ -178,6 +183,8 @@ class Trainer:
                 self.cli.training_iteration(training_iterations)
 
                 self.train()
+
+                self.update_stats()
 
                 self.scores = {}  # reset scores
                 self.networks_sources = {}  # reset sources
@@ -245,7 +252,7 @@ class Trainer:
                 self.networks_sources[
                     hash(mutated_networks[mutation_index])
                 ] = "Mutation"
-        mutated_networks[256] = NeuralNetwork.random()
+        mutated_networks[256] = NeuralNetwork.random(RANDOM_MAXIMUM)
         self.networks_sources[hash(mutated_networks[256])] = "Random"
         self.mutated_networks = mutated_networks
         self.cli.end_network_gen()
