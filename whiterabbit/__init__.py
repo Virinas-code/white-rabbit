@@ -9,6 +9,8 @@ import os
 
 from .neural_network.training import Trainer
 
+__version__: str = "0.1.4"
+
 
 def train_start(config: bool = False) -> None:
     """

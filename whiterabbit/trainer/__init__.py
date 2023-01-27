@@ -10,14 +10,12 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
-from types import MethodType
-from typing import Callable, ClassVar, Literal, Self, Union, TypeAlias
+from typing import Callable, Literal, Union, TypeAlias
 
 from filelock import FileLock
 import numpy as np
 
 from ..neural_network import NeuralNetwork
-from ..types import Method
 from .cli import TrainerCLI
 from .config import DEPTHS, NETWORKS_INDEXES_PLAYING, RANDOM_MAXIMUM
 from .functions import (
@@ -85,7 +83,7 @@ class Trainer:
     play_game: Callable = func_play_game
     core_play_game: Callable = func_core_play_game
 
-    acquire_lock: MethodType = func_acquire_lock
+    acquire_lock: Callable = func_acquire_lock
 
     update_stats: Callable = func_update_stats
 
