@@ -23,7 +23,7 @@ filelock = "^3.9.0"
 matplotlib = "^3.6.3"
 
 [tool.poetry.dev-dependencies]
-black = "^22.10.0"
+black = "^24.3.0"
 pylint = "^2.15.5"
 mypy = "^0.991"
 py-spy = "^0.3.14"
