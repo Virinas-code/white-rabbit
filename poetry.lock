@@ -548,13 +548,13 @@ unicode-backport = ["unicodedata2"]
 
 [[package]]
 name = "chess"
-version = "1.9.4"
+version = "1.10.0"
 description = "A chess library with move generation and validation, Polyglot opening book probing, PGN reading and writing, Gaviota tablebase probing, Syzygy tablebase probing, and XBoard/UCI engine communication."
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "chess-1.9.4-py3-none-any.whl", hash = "sha256:44d471b1ba71a4287c1bb9af3d6b472df37f07686ec52d5d5feb982b0fcfad34"},
-    {file = "chess-1.9.4.tar.gz", hash = "sha256:7f42d664f8975abe46e34bd7d131efd2bba65dc78bd1c226f554eb6ca4a9b381"},
+    {file = "chess-1.10.0-py3-none-any.whl", hash = "sha256:48ff7c084a370811819cfc753c2ee159942356ada70824666bd01ee3fca170d0"},
+    {file = "chess-1.10.0.tar.gz", hash = "sha256:bccde105f54aa436e899f92b4ba953731c65012a863fd9235683d0e2863ccd54"},
 ]
 
 [[package]]
@@ -3948,4 +3948,4 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-it
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11,<3.12"
-content-hash = "3a5e83375f1f50e125bfbdd0b19a9f776bb58ba6ebe9267efcc676514fd519d2"
+content-hash = "75c72fa433219534c7d78592f9d0ab6bb009294efdf863e7b49db3bd23c3043d"

@@ -11,7 +11,7 @@ python = "^3.11,<3.12"
 python-chess = "^1.999"
 numpy = "^1.24.1"
 psutil = "^5.9.4"
-chess = "^1.9.2"
+chess = "^1.10.0"
 PyYAML = "^6.0"
 requests = "^2.32.2"
 rich = {extras = ["jupyter"], version = "^12.6.0"}
