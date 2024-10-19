@@ -31,7 +31,7 @@ jupyter = "^1.0.0"
 notebook = "^6.5.2"
 pytest-benchmark = "^4.0.0"
 austin-tui = "^1.2.0"
-flake8 = "^7.1.0"
+flake8 = "^7.1.1"
 pyinstrument = "^4.4.0"
 textual = {extras = ["dev"], version = "^0.6.0"}
 
