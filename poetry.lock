@@ -313,13 +313,13 @@ toml = ">=0.10,<1.0"
 
 [[package]]
 name = "austin-tui"
-version = "1.2.2"
+version = "1.2.3"
 description = "The top-like text-based user interface for Austin"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "austin_tui-1.2.2-py3-none-any.whl", hash = "sha256:34981178027565d39ce85dff0b918390ff1ded49600baa95f53911e3fdaef0ce"},
-    {file = "austin_tui-1.2.2.tar.gz", hash = "sha256:59033a496b0c130809b5e45718b3625541ff61142c8648e2334f243bc0b7397f"},
+    {file = "austin_tui-1.2.3-py3-none-any.whl", hash = "sha256:093728d8e0eefb54aff6fef37bd7a01b883a264bb5e0922fa1a7d108b2022425"},
+    {file = "austin_tui-1.2.3.tar.gz", hash = "sha256:c1cd322ab5598a7ea98ca50dece1de5ea9e625968ac112d2b3f1db148b283e68"},
 ]
 
 [package.dependencies]
@@ -3948,4 +3948,4 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-it
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11,<3.12"
-content-hash = "d3a97abda246ea9921c7e6d5e123224675457b9731c89161239ea9a901dc39aa"
+content-hash = "3a5e83375f1f50e125bfbdd0b19a9f776bb58ba6ebe9267efcc676514fd519d2"
