@@ -3536,13 +3536,13 @@ test = ["pre-commit", "pytest (>=7.0)", "pytest-timeout"]
 
 [[package]]
 name = "textual"
-version = "0.6.0"
+version = "0.8.2"
 description = "Modern Text User Interface framework"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "textual-0.6.0-py3-none-any.whl", hash = "sha256:08236279ed0b53d264f7ac61fd346cace7a49fcc1682ea4d195c3045ac0715bc"},
-    {file = "textual-0.6.0.tar.gz", hash = "sha256:32e901085aaf217290025c4d934c414ef7e203da7d334b80333240e9b867e771"},
+    {file = "textual-0.8.2-py3-none-any.whl", hash = "sha256:59831bd846f9607947723aa5cea9aacd333711e75470d946273d64b594ebbafd"},
+    {file = "textual-0.8.2.tar.gz", hash = "sha256:1492e8d35b52584813a8c1e01e921dcee29b782d97352fba74726db74750cbe2"},
 ]
 
 [package.dependencies]
@@ -3948,4 +3948,4 @@ test = ["big-O", "jaraco.functools", "jaraco.itertools", "jaraco.test", "more-it
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11,<3.12"
-content-hash = "75c72fa433219534c7d78592f9d0ab6bb009294efdf863e7b49db3bd23c3043d"
+content-hash = "8d84af3e9f2627f2a3c46074db7e5357e662968b15740933ebc40818ba9107ca"
