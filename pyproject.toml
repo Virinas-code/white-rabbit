@@ -15,7 +15,7 @@ chess = "^1.10.0"
 PyYAML = "^6.0"
 requests = "^2.32.3"
 rich = {extras = ["jupyter"], version = "^12.6.0"}
-setuptools = "^70.0.0"
+setuptools = "^75.2.0"
 click = "^8.1.7"
 backoff = "^2.2.1"
 textual = "^0.8.2"
