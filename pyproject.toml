@@ -13,7 +13,7 @@ numpy = "^1.24.1"
 psutil = "^5.9.4"
 chess = "^1.10.0"
 PyYAML = "^6.0"
-requests = "^2.32.2"
+requests = "^2.32.3"
 rich = {extras = ["jupyter"], version = "^12.6.0"}
 setuptools = "^70.0.0"
 click = "^8.1.3"
