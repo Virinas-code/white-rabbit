@@ -10,7 +10,7 @@ packages = [{include = "whiterabbit"}]
 python = "^3.11,<3.12"
 python-chess = "^1.999"
 numpy = "^1.24.1"
-psutil = "^5.9.4"
+psutil = "^6.1.0"
 chess = "^1.10.0"
 PyYAML = "^6.0"
 requests = "^2.32.3"
